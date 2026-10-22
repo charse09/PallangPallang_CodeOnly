@@ -83,7 +83,7 @@ namespace _Project.Scripts.VisualScripting
             float elapsedTime = 0f;
 
 #if UNITY_EDITOR
-            Debug.Log($"<color=yellow>[{gameObject.name}]</color> 커스텀 회전 연출 가동: {rotateAngle}도, 목표 시간: {timeToRotate}초 (Rigidbody 사용: {rb != null})");
+            //Debug.Log($"<color=yellow>[{gameObject.name}]</color> 커스텀 회전 연출 가동: {rotateAngle}도, 목표 시간: {timeToRotate}초 (Rigidbody 사용: {rb != null})");
 #endif
 
             // 2) 지정된 시간 동안 루프 구동

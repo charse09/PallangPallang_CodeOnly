@@ -27,10 +27,17 @@ namespace _Project.Scripts.VisualScripting
         [Tooltip("레일과 레일 사이의 간격 (미터)")]
         public float railDistance = 3f;
 
+        [Header("Exit Settings")]
+        [Tooltip("체크 시(true): 구역을 벗어날 때 튕겨 나가며 종이(누운 상태)가 됩니다.\n체크 해제 시(false): 눕지 않고 서 있는 상태로 자연스럽게 지나갑니다.")]
+        public bool changeToPaperOnExit = true;
+
+        [Header("Jump Settings")]
+        [Tooltip("체크 시 구르는 동안 점프로 탈출 가능, 해제 시 점프 불가")]
+        public bool allowJumpToExit = false;
+
         private bool isWindActive = true;
         private float currentTimer = 0f;
 
-        // [수정] 콜라이더 리스트 대신 OnTriggerStay 타임스탬프로 감지 (콜라이더 생성/삭제 문제 해결)
         private Dictionary<PlayerLocomotion, float> activePlayers = new Dictionary<PlayerLocomotion, float>();
         private Dictionary<Rigidbody, float> activeRigidbodies = new Dictionary<Rigidbody, float>();
 
@@ -69,7 +76,6 @@ namespace _Project.Scripts.VisualScripting
 
         private void OnTriggerStay(Collider other)
         {
-            // 1. 플레이어 감지 (타임스탬프 갱신)
             PlayerLocomotion player = other.GetComponentInParent<PlayerLocomotion>();
             if (player != null)
             {
@@ -78,7 +84,6 @@ namespace _Project.Scripts.VisualScripting
                 return;
             }
 
-            // 2. 일반 강체 감지
             Rigidbody rb = other.attachedRigidbody;
             if (rb != null && !rb.isKinematic)
             {
@@ -89,7 +94,7 @@ namespace _Project.Scripts.VisualScripting
         private void FixedUpdate()
         {
             float currentTime = Time.time;
-            float timeoutThreshold = 0.15f; // OnTriggerStay가 감지되지 않으면 이탈로 판단하는 시간 간격
+            float timeoutThreshold = 0.15f;
 
             // 1. 플레이어 처리 및 이탈 검사
             playerRemoveBuffer.Clear();
@@ -98,7 +103,6 @@ namespace _Project.Scripts.VisualScripting
                 PlayerLocomotion player = kvp.Key;
                 float lastSeenTime = kvp.Value;
 
-                // 활성화 상태가 아니거나 지정된 시간 동안 OnTriggerStay가 발생하지 않았으면 이탈 처리
                 if (player == null || !player.gameObject.activeInHierarchy || (currentTime - lastSeenTime > timeoutThreshold))
                 {
                     playerRemoveBuffer.Add(player);
@@ -109,7 +113,7 @@ namespace _Project.Scripts.VisualScripting
 
                 if (WindShelter.IsSheltered(player))
                 {
-                    if (player.isWindRolling) player.ExitWindRollMode();
+                    if (player.isWindRolling) player.ExitWindRollMode(changeToPaperOnExit);
                     continue;
                 }
 
@@ -118,8 +122,9 @@ namespace _Project.Scripts.VisualScripting
 
                 player.AddContinuousForce(finalWindForce * Time.fixedDeltaTime);
 
-                // 구르기 상태가 아닐 때 구르기 진입 시도
-                // (EnterWindRollMode 내부에서 !isGrounded일 경우 알아서 실패하므로, 공중에서는 PaperState 유지 / 착지 시 자동 구르기 전환)
+                // [추가] 인스펙터의 점프 허용 설정을 플레이어에게 실시간 전달
+                player.canJumpInWindRoll = allowJumpToExit;
+
                 if (!player.isWindRolling)
                 {
                     player.EnterWindRollMode(worldWindDirection, railCount, railDistance, transform.position);
@@ -130,13 +135,14 @@ namespace _Project.Scripts.VisualScripting
                 }
             }
 
-            // 구역을 나간 플레이어 정돈
+            // 구역을 나간 플레이어 정돈 (인스펙터의 changeToPaperOnExit 설정 적용)
             foreach (var player in playerRemoveBuffer)
             {
                 if (player != null)
                 {
-                    player.ExitWindRollMode();
+                    player.ExitWindRollMode(changeToPaperOnExit);
                     player.isInWindZone = false;
+                    player.canJumpInWindRoll = false; // [추가] 구역 이탈 시 점프 플래그 초기화
                 }
                 activePlayers.Remove(player);
             }
@@ -177,7 +183,8 @@ namespace _Project.Scripts.VisualScripting
                 PlayerLocomotion player = kvp.Key;
                 if (player != null && player.isWindRolling)
                 {
-                    player.ExitWindRollMode();
+                    player.ExitWindRollMode(changeToPaperOnExit);
+                    player.canJumpInWindRoll = false; // [추가] 바람 정지 시 초기화
                 }
             }
         }
@@ -189,7 +196,11 @@ namespace _Project.Scripts.VisualScripting
             foreach (var kvp in activePlayers)
             {
                 PlayerLocomotion player = kvp.Key;
-                if (player != null) player.isInWindZone = false;
+                if (player != null)
+                {
+                    player.isInWindZone = false;
+                    player.canJumpInWindRoll = false;
+                }
             }
 
             activePlayers.Clear();

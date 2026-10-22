@@ -357,4 +357,10 @@ public class FloatingPet : MonoBehaviour
         _manualPaperStateOverride = enableOverride;
         _isManualPaperState = isPaper;
     }
+    private void OnEnable()
+    {
+        _basePosition = transform.position;
+        _smoothVelocity = Vector3.zero;
+    }
+
 }

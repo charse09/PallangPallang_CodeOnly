@@ -1,8 +1,9 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.SceneManagement;
 using TMPro;
+using UnityEngine.EventSystems;
 
 public class LobbyManager : MonoBehaviour
 {
@@ -44,6 +45,13 @@ public class LobbyManager : MonoBehaviour
         MenuManager menuManager = Object.FindFirstObjectByType<MenuManager>(FindObjectsInactive.Include);
         if (menuManager != null)
         {
+            menuManager.SetupTopmostPanels();
+
+            if (memoryPanel == null && menuManager.diaryPanel != null)
+            {
+                memoryPanel = menuManager.diaryPanel;
+            }
+
             if (settingsPanel == null && menuManager.settingsPanel != null)
             {
                 settingsPanel = menuManager.settingsPanel;
@@ -56,11 +64,18 @@ public class LobbyManager : MonoBehaviour
         }
 
         // 2. UICanvas 싱글톤 또는 씬 내 오브젝트에서 추가 검색 (보조)
-        if (settingsPanel == null || quitConfirmationPanel == null)
+        if (memoryPanel == null || settingsPanel == null || quitConfirmationPanel == null)
         {
             UICanvas uiCanvas = UICanvas.instance ?? Object.FindFirstObjectByType<UICanvas>(FindObjectsInactive.Include);
             if (uiCanvas != null)
             {
+                if (memoryPanel == null)
+                {
+                    Transform t = FindChildRecursive(uiCanvas.transform, "DiaryPanel") ?? 
+                                  FindChildRecursive(uiCanvas.transform, "MemoryPanel");
+                    if (t != null) memoryPanel = t.gameObject;
+                }
+
                 if (settingsPanel == null)
                 {
                     Transform t = FindChildRecursive(uiCanvas.transform, "SettingPanel") ?? 
@@ -73,6 +88,16 @@ public class LobbyManager : MonoBehaviour
                     Transform t = FindChildRecursive(uiCanvas.transform, "QuitConfirmationPanel");
                     if (t != null) quitConfirmationPanel = t.gameObject;
                 }
+            }
+        }
+
+        // 3. 만약 여전히 memoryPanel이 null인 경우, DontDestroyOnLoad 씬 전체에서 DiaryManager 컴포넌트 등으로 추가 탐색 (최후의 보루)
+        if (memoryPanel == null)
+        {
+            DiaryManager diaryMgr = Object.FindFirstObjectByType<DiaryManager>(FindObjectsInactive.Include);
+            if (diaryMgr != null)
+            {
+                memoryPanel = diaryMgr.gameObject;
             }
         }
     }
@@ -120,7 +145,12 @@ public class LobbyManager : MonoBehaviour
 
         if (memoryPanel != null)
         {
+            memoryPanel.transform.SetAsLastSibling();
             memoryPanel.SetActive(true);
+        }
+        else
+        {
+            Debug.LogWarning("[LobbyManager] memoryPanel (DiaryPanel) 참조를 찾을 수 없습니다.");
         }
     }
 
@@ -131,11 +161,17 @@ public class LobbyManager : MonoBehaviour
 
         if (settingsPanel != null)
         {
+            settingsPanel.transform.SetAsLastSibling();
             settingsPanel.SetActive(true);
         }
         else
         {
             Debug.LogWarning("[LobbyManager] settingsPanel 참조를 찾을 수 없습니다.");
+        }
+
+        if (EventSystem.current != null)
+        {
+            EventSystem.current.SetSelectedGameObject(null);
         }
     }
 
@@ -147,6 +183,11 @@ public class LobbyManager : MonoBehaviour
         {
             settingsPanel.SetActive(false);
         }
+
+        if (EventSystem.current != null)
+        {
+            EventSystem.current.SetSelectedGameObject(null);
+        }
     }
 
     // 메인 로비 화면에서 [게임 종료] 버튼을 눌렀을 때 (팝업창을 띄움)
@@ -156,11 +197,17 @@ public class LobbyManager : MonoBehaviour
 
         if (quitConfirmationPanel != null)
         {
+            quitConfirmationPanel.transform.SetAsLastSibling();
             quitConfirmationPanel.SetActive(true);
         }
         else
         {
             Debug.LogWarning("[LobbyManager] quitConfirmationPanel 참조를 찾을 수 없습니다.");
+        }
+
+        if (EventSystem.current != null)
+        {
+            EventSystem.current.SetSelectedGameObject(null);
         }
     }
 
@@ -180,6 +227,11 @@ public class LobbyManager : MonoBehaviour
         if (targetPanel != null)
         {
             targetPanel.SetActive(false);
+        }
+
+        if (EventSystem.current != null)
+        {
+            EventSystem.current.SetSelectedGameObject(null);
         }
     }
 }

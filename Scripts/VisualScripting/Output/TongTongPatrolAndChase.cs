@@ -5,8 +5,9 @@ using UnityEngine;
 namespace _Project.Scripts.VisualScripting
 {
     /// <summary>
-    /// 순찰 경로를 왕복(Ping-Pong)하며 통통 튀어 이동하다가,
+    /// 순찰 경로를 왕복(Ping-Pong)하며 지정한 보폭으로 통통 튀어 분할 이동하다가,
     /// 조건 충족 시 대상을 주시하며 추적을 유지하고, 복귀 조건(OR) 충족 시에만 순찰로 돌아옵니다.
+    /// [상태 잠금]: 회전 중에는 플레이어 감지 및 상태 전환이 일체 차단되어 오감지와 와리가리 현상을 방지합니다.
     /// </summary>
     public class TongTongPatrolAndChase : ProcessBase
     {
@@ -27,24 +28,30 @@ namespace _Project.Scripts.VisualScripting
         }
 
         [Header("1. Execution Settings")]
-        [Tooltip("체크 시 게임 시작과 동시에 자동으로 순찰을 시작합니다. 체크 해제 시 외부에서 Execute()를 호출해야 시작합니다.")]
+        [Tooltip("체크 시 게임 시작과 동시에 자동으로 순찰을 시작합니다.")]
         [SerializeField] private bool autoStartOnStart = true;
 
-        [Header("2. Patrol Settings")]
+        [Header("2. Patrol Settings (순찰 설정)")]
         [Tooltip("순찰 이동 방식 (기본: PingPong 왕복)")]
         [SerializeField] private PatrolMode patrolMode = PatrolMode.PingPong;
 
         [Tooltip("순찰할 착지 지점(Waypoint) 리스트")]
         [SerializeField] private List<Transform> patrolPoints = new List<Transform>();
 
-        [SerializeField] private float patrolBounceHeight = 2.0f;
-        [SerializeField] private float patrolBounceDuration = 0.5f;
+        [Tooltip("순찰 시 1회 도약 최대 이동 거리 (보폭)")]
+        [SerializeField] private float patrolStepDistance = 2.0f;
 
-        [Header("3. Chase Settings")]
+        [Tooltip("순찰 시 1회 도약 포물선 높이")]
+        [SerializeField] private float patrolBounceHeight = 1.5f;
+
+        [Tooltip("순찰 시 1회 도약 체공 시간 (초)")]
+        [SerializeField] private float patrolBounceDuration = 0.4f;
+
+        [Header("3. Chase Settings (추적 설정)")]
         [Tooltip("추적할 대상 Transform (비워두면 Tag가 'Player'인 대상을 자동 탐색)")]
         [SerializeField] private Transform chaseTarget;
 
-        [Tooltip("1회 도약 시 최대 이동 거리 (보폭)")]
+        [Tooltip("추적 시 1회 도약 최대 이동 거리 (보폭)")]
         [SerializeField] private float chaseStepDistance = 2.5f;
 
         [Tooltip("최대 보폭으로 뛸 때의 포물선 높이")]
@@ -56,41 +63,52 @@ namespace _Project.Scripts.VisualScripting
         [Tooltip("플레이어에게 완전히 밀착했을 때 제자리 바운드 높이")]
         [SerializeField] private float touchBounceHeight = 0.8f;
 
-        [Header("4. External Trigger Conditions (조건 감지용 Output)")]
-        [Tooltip("이 Output의 IsOn이 true가 되는 순간 추적을 시작하고, 복귀 조건 전까지 계속 추적을 유지합니다.")]
-        [SerializeField] private ProcessBase chaseTriggerCondition;
+        [Header("4. Ground Alignment Settings (바닥 뚫림 방지)")]
+        [Tooltip("체크 시 착지할 바닥면을 레이캐스트로 탐지하여 바닥 위에 완벽히 안착시킵니다.")]
+        [SerializeField] private bool snapToGround = true;
 
-        [Tooltip("[복귀 조건 1] 이 Output이 IsOn되면 추적을 멈추고 순찰로 복귀합니다 (OR 조건 1).")]
-        [SerializeField] private ProcessBase returnTriggerCondition1;
+        [Tooltip("바닥면으로 인식할 레이어")]
+        [SerializeField] private LayerMask groundLayerMask = 1 << 0; // Default
 
-        [Tooltip("[복귀 조건 2] 이 Output이 IsOn되면 추적을 멈추고 순찰로 복귀합니다 (OR 조건 2).")]
-        [SerializeField] private ProcessBase returnTriggerCondition2;
+        [Tooltip("바닥면으로부터 띄울 높이 (공의 반지름/중심 높이)")]
+        [SerializeField] private float groundOffset = 0.5f;
 
-        [Tooltip("이 Output의 IsOn이 true가 되면 접촉 액션을 실행합니다. (예: 플레이어 피격 Trigger)")]
-        [SerializeField] private ProcessBase contactTriggerCondition;
-
-        [Header("5. Linked Output Actions (연계 실행용 Output)")]
-        [Tooltip("추적을 시작하는 순간 1회 실행할 외부 Output")]
-        [SerializeField] private ProcessBase onChaseStartAction;
-
-        [Tooltip("추적을 멈추고 다시 순찰/복귀로 돌아갈 때 1회 실행할 외부 Output")]
-        [SerializeField] private ProcessBase onReturnStartAction;
-
-        [Tooltip("접촉(contactTriggerCondition)이 활성화되었을 때 즉시 실행할 외부 Output")]
-        [SerializeField] private ProcessBase onContactAction;
-
-        [Header("6. Rotation Settings")]
+        [Header("5. State Lock & Rotation (★ 상태 잠금 회전)")]
         [Tooltip("Y축 회전만 고정하여 위아래로 기우뚱하지 않도록 합니다.")]
         [SerializeField] private bool lockYAxis = true;
 
         [Tooltip("메쉬가 반대 방향으로 제작된 경우 체크 (180도 반전)")]
         [SerializeField] private bool reverseFacing = false;
 
-        [Tooltip("부드러운 회전 적용 여부")]
-        [SerializeField] private bool useSmoothRotation = true;
+        [Tooltip("회전 속도")]
         [SerializeField] private float rotationSpeed = 14f;
 
-        [Header("7. Squash & Impact FX")]
+        [Tooltip("★ 회전 중으로 판정할 각도 차이 (도). 목표 방향과 이 각도 이상 벌어져 돌고 있을 때는 상태 전환(추적/복귀)이 완벽히 잠깁니다.")]
+        [Range(5f, 45f)]
+        [SerializeField] private float turnAngleThreshold = 20f;
+
+        [Tooltip("순찰 중 다음 목표 방향과 각도 차이가 클 때 점프 전 제자리에서 먼저 돌고 출발할지 여부 (추천: 체크)")]
+        [SerializeField] private bool rotateInPlaceBeforeStep = true;
+
+        [Header("6. External Trigger Conditions (조건 감지용 Output)")]
+        [Tooltip("이 Output의 IsOn이 true가 되는 순간 추적을 시작합니다.")]
+        [SerializeField] private ProcessBase chaseTriggerCondition;
+
+        [Tooltip("[복귀 조건 1] 이 Output이 IsOn되면 추적을 멈추고 순찰로 복귀합니다.")]
+        [SerializeField] private ProcessBase returnTriggerCondition1;
+
+        [Tooltip("[복귀 조건 2] 이 Output이 IsOn되면 추적을 멈추고 순찰로 복귀합니다.")]
+        [SerializeField] private ProcessBase returnTriggerCondition2;
+
+        [Tooltip("접촉 액션 실행용 Output (예: 피격 Trigger)")]
+        [SerializeField] private ProcessBase contactTriggerCondition;
+
+        [Header("7. Linked Output Actions (연계 실행용 Output)")]
+        [SerializeField] private ProcessBase onChaseStartAction;
+        [SerializeField] private ProcessBase onReturnStartAction;
+        [SerializeField] private ProcessBase onContactAction;
+
+        [Header("8. Squash & Impact FX")]
         [SerializeField] private Transform ballTransform;
         [SerializeField] private bool useSquashAndStretch = true;
         [SerializeField] private float squashAmount = 0.3f;
@@ -105,6 +123,7 @@ namespace _Project.Scripts.VisualScripting
         private int _currentPatrolIndex = 0;
         private int _patrolDirection = 1;
         private bool _hasFiredContactAction = false;
+        private bool _isTurning = false; // ★ 회전 잠금 플래그
 
         private void Awake()
         {
@@ -141,8 +160,17 @@ namespace _Project.Scripts.VisualScripting
                 ballTransform.localScale = _originalScale;
             }
 
+            _isTurning = false;
             _currentState = AIState.Idle;
             _hasFiredContactAction = false;
+        }
+
+        public override void Reset()
+        {
+            base.Reset();
+            _isTurning = false;
+            _currentState = AIState.Idle;
+            IsOn = false;
         }
 
         public override void Execute()
@@ -155,6 +183,7 @@ namespace _Project.Scripts.VisualScripting
             }
 
             _currentState = AIState.Patrolling;
+            _isTurning = false;
             IsOn = false;
             _mainLoopCoroutine = StartCoroutine(MainAILoopRoutine());
         }
@@ -170,6 +199,7 @@ namespace _Project.Scripts.VisualScripting
                     yield break;
                 }
 
+                // ★ 상태 전환 검사 (회전 중일 때는 내부에서 즉시 차단됨)
                 CheckStateTransitions();
 
                 switch (_currentState)
@@ -193,9 +223,18 @@ namespace _Project.Scripts.VisualScripting
             }
         }
 
+        /// <summary>
+        /// ★ 회전 상태 잠금(State Lock): 회전 중이거나 방향이 크게 어긋나 있으면 상태 전환을 완전히 무시합니다.
+        /// </summary>
         private void CheckStateTransitions()
         {
-            // 1. 순찰/복귀 중 -> 진입 트리거가 한 번이라도 On되면 즉시 추적 시작 & 고정
+            // 회전 중 플래그가 켜져 있거나, 순찰 목표 방향과 각도가 크게 벌어져 있으면 절대 감지/전환 불가
+            if (_isTurning || IsPatrolDirectionMisaligned())
+            {
+                return;
+            }
+
+            // 1. 순찰/복귀 중 -> 추적 시작
             if (_currentState != AIState.Chasing && chaseTriggerCondition != null && chaseTriggerCondition.IsOn)
             {
                 _currentState = AIState.Chasing;
@@ -208,7 +247,7 @@ namespace _Project.Scripts.VisualScripting
                 return;
             }
 
-            // 2. 추적 중 -> 오직 명시적인 복귀 조건(returnTrigger 1 또는 2)이 켜졌을 때만 복귀
+            // 2. 추적 중 -> 복귀 조건 충족 시 순찰/복귀로 전환
             if (_currentState == AIState.Chasing)
             {
                 bool isReturnTriggered = (returnTriggerCondition1 != null && returnTriggerCondition1.IsOn) ||
@@ -226,6 +265,25 @@ namespace _Project.Scripts.VisualScripting
                     }
                 }
             }
+        }
+
+        private bool IsPatrolDirectionMisaligned()
+        {
+            if (_currentState != AIState.Patrolling) return false;
+            if (patrolPoints == null || patrolPoints.Count == 0) return false;
+
+            Transform targetPoint = patrolPoints[_currentPatrolIndex];
+            if (targetPoint == null) return false;
+
+            Vector3 toTarget = targetPoint.position - ballTransform.position;
+            if (lockYAxis) toTarget.y = 0f;
+            if (toTarget.sqrMagnitude < 0.001f) return false;
+
+            Vector3 targetForward = toTarget.normalized;
+            if (reverseFacing) targetForward = -targetForward;
+
+            Vector3 currentForward = ballTransform.forward;
+            return Vector3.Angle(currentForward, targetForward) > turnAngleThreshold;
         }
 
         private void CheckContactCondition()
@@ -263,12 +321,74 @@ namespace _Project.Scripts.VisualScripting
             }
 
             Vector3 startPos = ballTransform.position;
-            Vector3 endPos = targetPoint.position;
+            Vector3 targetPos = targetPoint.position;
+            Vector3 diff = targetPos - startPos;
+            if (lockYAxis) diff.y = 0f;
+
+            // ★ 각도가 많이 틀어져 있는 경우(예: Ping-Pong 끝 180도 반전 코너),
+            // 점프하기 전에 제자리에서 먼저 안전하게 몸을 돌립니다. (이 동안 상태 잠금 유지!)
+            if (rotateInPlaceBeforeStep && diff.sqrMagnitude > 0.001f)
+            {
+                Vector3 desiredForward = diff.normalized;
+                if (reverseFacing) desiredForward = -desiredForward;
+
+                float angleDiff = Vector3.Angle(ballTransform.forward, desiredForward);
+                if (angleDiff > turnAngleThreshold)
+                {
+                    yield return StartCoroutine(RotateInPlaceRoutine(desiredForward));
+                }
+            }
+
+            float horizontalDist = diff.magnitude;
+            Vector3 endPos;
+            bool reachedTargetWaypoint = false;
+
+            if (horizontalDist <= patrolStepDistance)
+            {
+                endPos = targetPos;
+                reachedTargetWaypoint = true;
+            }
+            else
+            {
+                float ratio = patrolStepDistance / horizontalDist;
+                endPos = startPos + diff.normalized * patrolStepDistance;
+                endPos.y = Mathf.Lerp(startPos.y, targetPos.y, ratio);
+            }
+
+            endPos.y = GetGroundAdjustedY(endPos, endPos.y);
 
             yield return StartCoroutine(BounceMotion(startPos, endPos, patrolBounceHeight, patrolBounceDuration, false));
 
             OnLandImpact(endPos);
-            AdvancePatrolIndex();
+
+            if (reachedTargetWaypoint)
+            {
+                AdvancePatrolIndex();
+            }
+        }
+
+        /// <summary>
+        /// ★ 제자리 회전 코루틴: 몸을 돌리는 동안 _isTurning = true로 잠겨 있어 감지가 차단됩니다.
+        /// </summary>
+        private IEnumerator RotateInPlaceRoutine(Vector3 targetForward)
+        {
+            _isTurning = true;
+            Quaternion targetRot = Quaternion.LookRotation(targetForward);
+
+            while (Quaternion.Angle(ballTransform.rotation, targetRot) > 5f)
+            {
+                if (!gameObject.activeInHierarchy || !enabled) yield break;
+
+                ballTransform.rotation = Quaternion.Slerp(
+                    ballTransform.rotation,
+                    targetRot,
+                    Time.deltaTime * rotationSpeed
+                );
+                yield return null;
+            }
+
+            ballTransform.rotation = targetRot;
+            _isTurning = false; // 회전 정렬 완료 후 잠금 해제
         }
 
         private void AdvancePatrolIndex()
@@ -329,10 +449,11 @@ namespace _Project.Scripts.VisualScripting
             else
             {
                 endPos = startPos + diff.normalized * chaseStepDistance;
-                endPos.y = targetPos.y;
                 stepBounceHeight = chaseBounceHeight;
                 stepBounceDuration = chaseBounceDuration;
             }
+
+            endPos.y = GetGroundAdjustedY(endPos, targetPos.y + groundOffset);
 
             yield return StartCoroutine(BounceMotion(startPos, endPos, stepBounceHeight, stepBounceDuration, true));
 
@@ -355,19 +476,35 @@ namespace _Project.Scripts.VisualScripting
             diff.y = 0f;
             float dist = diff.magnitude;
 
+            Vector3 endPos;
             if (dist <= chaseStepDistance)
             {
-                yield return StartCoroutine(BounceMotion(startPos, targetPos, patrolBounceHeight, patrolBounceDuration, false));
-                OnLandImpact(targetPos);
+                endPos = targetPos;
+                endPos.y = GetGroundAdjustedY(endPos, targetPos.y);
+                yield return StartCoroutine(BounceMotion(startPos, endPos, patrolBounceHeight, patrolBounceDuration, false));
+                OnLandImpact(endPos);
                 _currentState = AIState.Patrolling;
             }
             else
             {
-                Vector3 nextPos = startPos + diff.normalized * chaseStepDistance;
-                nextPos.y = targetPos.y;
-                yield return StartCoroutine(BounceMotion(startPos, nextPos, patrolBounceHeight, patrolBounceDuration, false));
-                OnLandImpact(nextPos);
+                endPos = startPos + diff.normalized * chaseStepDistance;
+                endPos.y = GetGroundAdjustedY(endPos, targetPos.y);
+                yield return StartCoroutine(BounceMotion(startPos, endPos, patrolBounceHeight, patrolBounceDuration, false));
+                OnLandImpact(endPos);
             }
+        }
+
+        private float GetGroundAdjustedY(Vector3 position, float fallbackY)
+        {
+            if (!snapToGround) return fallbackY;
+
+            Vector3 rayStart = new Vector3(position.x, position.y + 3.0f, position.z);
+            if (Physics.Raycast(rayStart, Vector3.down, out RaycastHit hit, 10.0f, groundLayerMask, QueryTriggerInteraction.Ignore))
+            {
+                return hit.point.y + groundOffset;
+            }
+
+            return fallbackY;
         }
 
         private int GetNearestPatrolIndex()
@@ -401,7 +538,7 @@ namespace _Project.Scripts.VisualScripting
                 float t = Mathf.Clamp01(elapsed / duration);
 
                 Vector3 currentPos = Vector3.Lerp(start, end, t);
-                currentPos.y += Mathf.Sin(t * Mathf.PI) * height; // 포물선 곡선 연출[cite: 1]
+                currentPos.y += Mathf.Sin(t * Mathf.PI) * height;
                 ballTransform.position = currentPos;
 
                 if (useSquashAndStretch)
@@ -411,10 +548,10 @@ namespace _Project.Scripts.VisualScripting
                         _originalScale.x * (1f - stretchFactor),
                         _originalScale.y * (1f + stretchFactor),
                         _originalScale.z * (1f - stretchFactor)
-                    ); // 탱탱볼 늘어남 효과[cite: 1]
+                    );
                 }
 
-                UpdateRotation(lookDirectlyAtTarget, start, end); // 회전 계산[cite: 2]
+                UpdateRotation(lookDirectlyAtTarget, start, end);
 
                 yield return null;
             }
@@ -429,27 +566,21 @@ namespace _Project.Scripts.VisualScripting
 
             if (lookDirectlyAtTarget && chaseTarget != null)
             {
-                dir = chaseTarget.position - ballTransform.position; // 타겟 직접 주시[cite: 2]
+                dir = chaseTarget.position - ballTransform.position;
             }
             else
             {
-                dir = end - start; // 이동 방향 주시[cite: 2]
+                dir = end - start;
             }
 
             if (lockYAxis) dir.y = 0f;
             if (dir.sqrMagnitude < 0.0001f) return;
 
-            Quaternion targetRot = Quaternion.LookRotation(dir.normalized); // 방향 회전값 계산[cite: 2]
-            if (reverseFacing) targetRot *= Quaternion.Euler(0f, 180f, 0f);
+            Vector3 targetForward = dir.normalized;
+            if (reverseFacing) targetForward = -targetForward;
 
-            if (useSmoothRotation)
-            {
-                ballTransform.rotation = Quaternion.Slerp(ballTransform.rotation, targetRot, Time.deltaTime * rotationSpeed);
-            }
-            else
-            {
-                ballTransform.rotation = targetRot;
-            }
+            Quaternion targetRot = Quaternion.LookRotation(targetForward);
+            ballTransform.rotation = Quaternion.Slerp(ballTransform.rotation, targetRot, Time.deltaTime * rotationSpeed);
         }
 
         private void OnLandImpact(Vector3 landPos)
@@ -458,17 +589,17 @@ namespace _Project.Scripts.VisualScripting
 
             if (landImpactFx != null)
             {
-                Instantiate(landImpactFx, landPos, Quaternion.identity); // 착지 이펙트 생성[cite: 1]
+                Instantiate(landImpactFx, landPos, Quaternion.identity);
             }
 
             if (_audioSource != null && landSfx != null)
             {
-                _audioSource.PlayOneShot(landSfx); // 착지 효과음[cite: 1]
+                _audioSource.PlayOneShot(landSfx);
             }
 
             if (useSquashAndStretch && gameObject.activeInHierarchy && enabled)
             {
-                StartCoroutine(SquashRoutine()); // 착지 찌그러짐 연출[cite: 1]
+                StartCoroutine(SquashRoutine());
             }
         }
 
@@ -489,7 +620,7 @@ namespace _Project.Scripts.VisualScripting
                     _originalScale.x * (1f + squashOffset),
                     _originalScale.y * (1f - squashOffset),
                     _originalScale.z * (1f + squashOffset)
-                ); // 착지 압축 연출[cite: 1]
+                );
 
                 yield return null;
             }

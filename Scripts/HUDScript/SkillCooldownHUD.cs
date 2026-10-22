@@ -26,6 +26,9 @@ public class SkillCooldownHUD : MonoBehaviour
     [SerializeField] private bool pulseScaleWhenReady = false; // 맥동(두근거림) 스케일 효과 활성화 여부
     [SerializeField] private float scalePulseAmount = 0.015f;
     [SerializeField] private float scalePulseSpeed = 3f;
+    [Tooltip("스케일 확대/축소 시 왼쪽 위 방향으로 커지도록 피벗을 우측 하단(1, 0)으로 자동 설정하고 위치를 보정합니다.")]
+    [SerializeField] private bool scaleTowardsTopLeft = true;
+    [SerializeField] private Vector2 targetPivot = new Vector2(1.5f, 0f);
 
     [Header("--- Procedural Outer Glow ---")]
     [SerializeField] private bool useOuterGlow = true; // 아이콘 뒤에 실제 후광(Glow Halo) 오브젝트를 생성할지 여부
@@ -33,6 +36,7 @@ public class SkillCooldownHUD : MonoBehaviour
     [SerializeField] private float outerGlowSizeMultiplier = 1.35f; // 아이콘 대비 후광의 크기 배율
 
     private Image hudImage;
+    private RectTransform myRectTransform;
     private Material customMaterial;
     private PlayerLocomotion playerController;
 
@@ -45,6 +49,12 @@ public class SkillCooldownHUD : MonoBehaviour
     void Start()
     {
         hudImage = GetComponent<Image>();
+        myRectTransform = GetComponent<RectTransform>();
+
+        if (scaleTowardsTopLeft)
+        {
+            SetPivotPreservePosition(myRectTransform, targetPivot);
+        }
 
         if (cooldownShader == null)
         {
@@ -149,8 +159,12 @@ public class SkillCooldownHUD : MonoBehaviour
         // 2. 동적 후광(Glow Overlay) 상태 제어
         if (glowImage != null && glowRect != null)
         {
-            // 후광 크기도 아이콘 크기에 맞춰서 동기화
+            // 후광 크기 및 위치를 아이콘의 중심점에 실시간 동기화
             glowRect.localScale = transform.localScale;
+            if (myRectTransform != null)
+            {
+                glowRect.position = myRectTransform.TransformPoint(myRectTransform.rect.center);
+            }
             
             // 후광 투명도 페이드 인/아웃
             float currentAlpha = glowImage.color.a;
@@ -169,16 +183,18 @@ public class SkillCooldownHUD : MonoBehaviour
         // 렌더링 순서 상 메인 아이콘 바로 뒤에 그려지도록 설정
         glowObj.transform.SetSiblingIndex(transform.GetSiblingIndex());
 
-        // 2. UI 컴포넌트 추가 및 RectTransform 복제
-        RectTransform myRect = GetComponent<RectTransform>();
+        // 2. UI 컴포넌트 추가 및 RectTransform 설정
         glowRect = glowObj.AddComponent<RectTransform>();
         
-        glowRect.anchorMin = myRect.anchorMin;
-        glowRect.anchorMax = myRect.anchorMax;
-        glowRect.pivot = myRect.pivot;
-        glowRect.anchoredPosition = myRect.anchoredPosition;
-        glowRect.sizeDelta = myRect.sizeDelta * outerGlowSizeMultiplier;
+        glowRect.anchorMin = myRectTransform.anchorMin;
+        glowRect.anchorMax = myRectTransform.anchorMax;
+        // 후광은 중심을 기준으로 사방으로 대칭 확장되어야 하므로 피벗은 (0.5, 0.5)로 고정
+        glowRect.pivot = new Vector2(0.5f, 0.5f);
+        glowRect.sizeDelta = myRectTransform.sizeDelta * outerGlowSizeMultiplier;
         glowRect.localScale = transform.localScale;
+        
+        // 후광의 중심을 아이콘의 실제 중심(Center) 월드 좌표에 일치시킴
+        glowRect.position = myRectTransform.TransformPoint(myRectTransform.rect.center);
 
         glowImage = glowObj.AddComponent<Image>();
         
@@ -254,5 +270,20 @@ public class SkillCooldownHUD : MonoBehaviour
         {
             Destroy(customMaterial);
         }
+    }
+
+    /// <summary>
+    /// 화면상의 시각적 위치를 그대로 유지하면서 RectTransform의 Pivot을 안전하게 변경합니다.
+    /// </summary>
+    private void SetPivotPreservePosition(RectTransform rect, Vector2 newPivot)
+    {
+        if (rect == null) return;
+        Vector2 deltaPivot = newPivot - rect.pivot;
+        if (deltaPivot.sqrMagnitude < 0.0001f) return;
+
+        Vector2 size = rect.rect.size;
+        Vector3 scale = rect.localScale;
+        rect.pivot = newPivot;
+        rect.anchoredPosition += new Vector2(deltaPivot.x * size.x * scale.x, deltaPivot.y * size.y * scale.y);
     }
 }

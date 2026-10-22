@@ -39,6 +39,9 @@ namespace _Project.Scripts.VisualScripting
 
             [Tooltip("Timer: duration초 자동 대기\nWaitInput: 클릭/키 입력 대기\nTimerOrInput: 둘 중 먼저 발생한 것으로 넘어감")]
             public DialogueProgressionMode progressionMode; // 진행 방식
+
+            [Tooltip("이 대사 줄에서만 특수하게 재생할 SFX 키 (비워둘 경우 기본 defaultSoundKey 재생)")]
+            public string soundKeyOverride;
         }
 
         [Header("Dialogue UI Reference")]
@@ -52,14 +55,20 @@ namespace _Project.Scripts.VisualScripting
         [SerializeField] private TMP_FontAsset fontAsset;     // 사용할 폰트
         [SerializeField] private float fontSize = 81.4f;      // 폰트 크기
 
-        // 🆕 [변경] 복잡한 에셋 파일 없이, 인스펙터에서 바로 대사를 나열할 수 있는 리스트!
         [Header("Dialogue Lines (대사 목록)")]
         [SerializeField] private List<DialogueLine> dialogueLines;
 
+        [Header("Audio Settings (사운드 연동)")]
+        [Tooltip("체크 시 대사창이 통! 튀어오를 때 효과음을 재생합니다.")]
+        [SerializeField] private bool playDialogueSound = true;
+
+        [Tooltip("대사창이 통! 튀어오를 때 재생할 기본 SFX 키 (SO_SFXTable 등록 키, 비워두면 무음)")]
+        [SerializeField] private string defaultSoundKey = "Dialogue_Tong";
+
         [Header("Layout Settings")]
-        [SerializeField] private Vector2 boxPosition = new Vector2(0f, 255f); 
-        [SerializeField] private Vector2 boxSize = new Vector2(2048f, 1045f); 
-        [SerializeField] private Vector3 boxScale = new Vector3(0.5f, 0.5f, 1f); 
+        [SerializeField] private Vector2 boxPosition = new Vector2(0f, 255f);
+        [SerializeField] private Vector2 boxSize = new Vector2(2048f, 1045f);
+        [SerializeField] private Vector3 boxScale = new Vector3(0.5f, 0.5f, 1f);
         [SerializeField] private Vector2 textPosition = new Vector2(240f, -143f);
         [SerializeField] private Vector2 textSize = new Vector2(1300f, 330f);
         [SerializeField] private float bounceAmount = 0.1f;
@@ -96,7 +105,7 @@ namespace _Project.Scripts.VisualScripting
         public override void Execute()
         {
             IsOn = false;
-            
+
             if (panelObject == null) CacheComponents();
 
             if (_dialogueRect == null || _tmpText == null)
@@ -119,7 +128,6 @@ namespace _Project.Scripts.VisualScripting
 
         private IEnumerator DialoguePlayRoutine()
         {
-            // 리스트에 적힌 대사들을 순서대로 루프 돌며 출력
             foreach (var line in dialogueLines)
             {
                 // 1. 화자 이미지 자동 변경
@@ -144,12 +152,16 @@ namespace _Project.Scripts.VisualScripting
                 _tmpText.text = line.dialogueText;
                 if (fontAsset != null) _tmpText.font = fontAsset;
                 _tmpText.fontSize = fontSize;
-                
+
                 RectTransform textRect = _tmpText.rectTransform;
                 textRect.anchoredPosition = textPosition;
                 textRect.sizeDelta = textSize;
 
-                // 4. 귀엽게 통! 튀는 연출
+                // 🔊 4. 효과음 재생 (playDialogueSound 체크 여부 확인 후 재생)
+                string keyToPlay = !string.IsNullOrEmpty(line.soundKeyOverride) ? line.soundKeyOverride : defaultSoundKey;
+                PlaySFX(keyToPlay);
+
+                // 5. 귀엽게 통! 튀는 연출
                 float bounceTimer = 0f;
                 float bounceDuration = 0.15f;
                 while (bounceTimer < bounceDuration)
@@ -162,26 +174,19 @@ namespace _Project.Scripts.VisualScripting
                 }
                 _dialogueRect.localScale = _originalBoxScale;
 
-                // 5. 진행 방식에 따라 대기
+                // 6. 진행 방식에 따라 대기
                 if (line.progressionMode == DialogueProgressionMode.WaitInput)
                 {
-                    // 이전 입력이 남아있어 즉시 넘어가는 현상 방지
                     yield return null;
                     yield return new WaitForSeconds(0.1f);
-
-                    // 마우스 클릭 또는 아무 키 입력 대기
                     yield return new WaitUntil(() => Input.GetMouseButtonDown(0) || Input.anyKeyDown);
-
-                    // 다음 줄 입력이 겹치지 않게 1프레임 대기
                     yield return null;
                 }
                 else if (line.progressionMode == DialogueProgressionMode.TimerOrInput)
                 {
-                    // 이전 입력이 남아있어 즉시 넘어가는 현상 방지
                     yield return null;
                     yield return new WaitForSeconds(0.1f);
 
-                    // 타이머와 입력을 동시에 체크 — 먼저 발생한 것으로 넘어감
                     float elapsed = 0f;
                     while (elapsed < line.duration)
                     {
@@ -190,19 +195,26 @@ namespace _Project.Scripts.VisualScripting
                         elapsed += Time.deltaTime;
                         yield return null;
                     }
-
-                    // 다음 줄 입력이 겹치지 않게 1프레임 대기
                     yield return null;
                 }
-                else // Timer (기본값, 기존 동작 유지)
+                else
                 {
                     yield return new WaitForSeconds(line.duration);
                 }
             }
 
-            // 모든 대사 목록이 끝나면 창을 끄고 다음 시퀀스 활성화
             panelObject.SetActive(false);
             IsOn = true;
+        }
+
+        private void PlaySFX(string soundKey)
+        {
+            if (!playDialogueSound) return;
+
+            if (!string.IsNullOrEmpty(soundKey) && SoundManager.Instance != null)
+            {
+                SoundManager.Instance.PlaySFX(soundKey);
+            }
         }
 
         public override void Reset()

@@ -1,5 +1,3 @@
-/*
-
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -7,8 +5,9 @@ using UnityEngine;
 namespace _Project.Scripts.VisualScripting
 {
     /// <summary>
-    /// Yenbeol(벌)이 플레이어를 들고 이동할 때, 
-    /// 플레이어가 Space바를 연타해야 고도를 유지/상승시키며 목적지까지 날아가는 QTE Output.
+    /// Yenbeol(벌)이 플레이어를 붙잡고 운반할 때,
+    /// 플레이어가 QTE Key(기본: Space)를 연타해야만 목적지까지 조금씩 전진하며,
+    /// 아무런 입력이 없으면 입력을 기다리며 제자리에서 호버링(대기)하는 QTE Output.
     /// </summary>
     [AddComponentMenu("Visual Scripting/Outputs/벌 플레이어 운반 (Space 연타 QTE)")]
     public class BeeCarrySpaceMashOutput : ProcessBase
@@ -31,37 +30,57 @@ namespace _Project.Scripts.VisualScripting
         [Tooltip("최종 목적지 Transform")]
         [SerializeField] private Transform destination;
 
-        [Header("Flight Settings")]
-        [Tooltip("Yenbeol이 날아가는 기본 수평 속도 (m/s)")]
+        [Header("Flight & Speed Settings")]
+        [Tooltip("Yenbeol이 연타에 반응하여 전진하는 속도 (m/s)")]
         [SerializeField] private float flySpeed = 4f;
 
         [Tooltip("도착 판정 수평 거리 (m)")]
         [SerializeField] private float arrivalThreshold = 0.2f;
 
-        [Header("★ Space Mash QTE Settings (스페이스바 연타 설정)")]
+        [Header("★ Space Mash QTE Settings (연타 이동 설정)")]
         [Tooltip("QTE에 사용할 키 (기본: Space)")]
         [SerializeField] private KeyCode qteKey = KeyCode.Space;
 
-        [Tooltip("스페이스바 1회 연타 시 상승하는 Y축 고도 (m)")]
-        [SerializeField] private float spaceBoostAmount = 0.35f;
+        [Tooltip("목적지까지 도달하는 데 필요한 총 연타 횟수 (0 이하로 설정 시 advanceDistancePerPress 거리 기반으로 자동 계산)")]
+        [SerializeField] private int requiredPressCount = 12;
 
-        [Tooltip("연타를 안 할 때 초당 떨어지는 속도 (m/s)")]
-        [SerializeField] private float gravityFallSpeed = 1.5f;
+        [Tooltip("requiredPressCount가 0 이하일 때 적용되는 1회 연타당 전진 거리 (m)")]
+        [SerializeField] private float advanceDistancePerPress = 0.6f;
 
-        [Tooltip("스페이스바로 올릴 수 있는 최대 고도 오프셋 (m)")]
-        [SerializeField] private float maxQteHeightOffset = 2.0f;
+        [Tooltip("연타 시 전진 보간 반응 속도 (높을수록 누르자마자 팍팍 전진)")]
+        [SerializeField] private float moveSmoothSpeed = 2.5f;
 
-        [Tooltip("연타 부족으로 떨어질 수 있는 최저 고도 오프셋 (m)")]
-        [SerializeField] private float minQteHeightOffset = -2.5f;
+        [Tooltip("스페이스 1회 연타 시 위로 끙차 들썩이는 Y축 반동 높이 (m)")]
+        [SerializeField] private float nudgeHopAmount = 0.25f;
 
-        [Tooltip("고도 변화가 적용되는 부드러움 (Lerp 속도)")]
-        [SerializeField] private float heightSmoothSpeed = 10f;
+        [Tooltip("스페이스 1회 연타 시 앞으로 끄덕이는 피치 각도 (도)")]
+        [SerializeField] private float nudgeTiltAngle = 10f;
 
-        [Header("Heavy & Unstable Motion (위태로운 연출)")]
-        [Tooltip("무거워서 아래로 쳐지는 Y축 미세 진동 폭")]
+        [Tooltip("움찔 반동 회복 속도")]
+        [SerializeField] private float nudgeRecoverySpeed = 4.5f;
+
+        [Tooltip("시작 직후 입력 무시 안정화 딜레이 (초)")]
+        [SerializeField] private float initialInputDelay = 0.15f;
+
+        [Header("Audio Settings (SoundManager Pooling)")]
+        [Tooltip("QTE 키를 누를 때마다 재생할 사운드 키 (SO_SFXTable 등록 키, 비워두면 무음)")]
+        [SerializeField] private string qtePressSoundKey = "YenBeol_Carry";
+
+        [Header("★ Ground Protection (바닥 뚫림 방지)")]
+        [Tooltip("체크 시 바닥 지형을 감지하여 플레이어가 땅을 뚫지 않도록 합니다.")]
+        [SerializeField] private bool preventGroundClipping = true;
+
+        [Tooltip("바닥으로 인식할 지형 LayerMask (Default, Ground 등)")]
+        [SerializeField] private LayerMask groundLayer = ~0;
+
+        [Tooltip("플레이어 발바닥 기준 추가 Y 오프셋 (0이면 발바닥이 바닥에 맞닿음)")]
+        [SerializeField] private float playerBottomOffset = 0.0f;
+
+        [Header("Heavy & Unstable Motion (위태로운 연출 / 대기 중 호버링)")]
+        [Tooltip("무거워서 아래로 쳐지는 Y축 미세 진동 폭 (대기 중 호버링 진폭)")]
         [SerializeField] private float heavyDipAmount = 0.2f;
 
-        [Tooltip("고도 미세 진동 속도")]
+        [Tooltip("고도 미세 진동 속도 (대기 중 호버링 주기)")]
         [SerializeField] private float heavyDipSpeed = 8.0f;
 
         [Tooltip("비틀거리는 좌우 흔들림 폭")]
@@ -73,285 +92,19 @@ namespace _Project.Scripts.VisualScripting
         [Tooltip("몸체가 기울어지는 최대 각도")]
         [SerializeField] private float maxTiltAngle = 15.0f;
 
+#pragma warning disable 0414
+        [Header("Compatibility Settings (하위 호환 필드)")]
+        [SerializeField, HideInInspector] private float spaceImpulse = 5.5f;
+        [SerializeField, HideInInspector] private float gravity = 18f;
+        [SerializeField, HideInInspector] private float fallMultiplier = 1.8f;
+        [SerializeField, HideInInspector] private float maxFallSpeed = 3.5f;
+        [SerializeField, HideInInspector] private float maxQteHeightOffset = 2.0f;
+#pragma warning restore 0414
+
         // 내부 상태
         private Coroutine _carryCoroutine;
         private Rigidbody _playerRb;
         private bool _wasKinematic;
-        private float _currentQteOffset = 0f;
-        private float _targetQteOffset = 0f;
-
-        public override void Execute()
-        {
-            if (yenbeolTransform == null || playerObject == null || destination == null)
-            {
-                Debug.LogWarning($"[{gameObject.name}] 필수 Transform/GameObject가 비어 있습니다.");
-                IsOn = true;
-                return;
-            }
-
-            IsOn = false;
-            if (_carryCoroutine != null) StopCoroutine(_carryCoroutine);
-            _carryCoroutine = StartCoroutine(CarryRoutine());
-        }
-
-        private IEnumerator CarryRoutine()
-        {
-            Transform playerTransform = playerObject.transform;
-
-            // STEP 1: 다른 플레이어 입력 및 이동 스크립트 전역 잠금
-            foreach (var script in scriptsToDisable)
-            {
-                if (script != null) script.enabled = false;
-            }
-
-            if (InputManager.Instance != null)
-            {
-                InputManager.Instance.enabled = false;
-            }
-
-            _playerRb = playerObject.GetComponent<Rigidbody>();
-            if (_playerRb != null)
-            {
-                _wasKinematic = _playerRb.isKinematic;
-                _playerRb.linearVelocity = Vector3.zero;
-                _playerRb.angularVelocity = Vector3.zero;
-                _playerRb.isKinematic = true;
-            }
-
-            yield return null;
-            yield return null;
-
-            // STEP 2: 플레이어 잡은 위치 오프셋 고정
-            Vector3 carryOffset = playerTransform.position - yenbeolTransform.position;
-
-            // STEP 3: 경로 구성
-            List<Vector3> pathTargets = new List<Vector3>();
-            foreach (var wp in waypoints)
-            {
-                if (wp != null) pathTargets.Add(wp.position);
-            }
-            pathTargets.Add(destination.position);
-
-            float totalFlightTime = 0f;
-            _targetQteOffset = 0f;
-            _currentQteOffset = 0f;
-
-            foreach (Vector3 target in pathTargets)
-            {
-                Vector3 segmentStartPos = yenbeolTransform.position;
-
-                while (GetHorizontalDistance(yenbeolTransform.position, target) > arrivalThreshold)
-                {
-                    totalFlightTime += Time.deltaTime;
-
-                    // ---------------------------------------------------------
-                    // ★ 핵심 QTE 로직: Space 연타 감지 및 중력 가감산
-                    // ---------------------------------------------------------
-                    // InputManager가 꺼져있어도 유니티 자체 Input.GetKeyDown은 정상 동작함!
-                    if (Input.GetKeyDown(qteKey))
-                    {
-                        _targetQteOffset += spaceBoostAmount;
-                    }
-
-                    // 시간 흐름에 따른 고도 수직 하강 (연타 늦으면 밑으로 떨어짐)
-                    _targetQteOffset -= gravityFallSpeed * Time.deltaTime;
-
-                    // 고도 범위 제한 (최대/최저 오프셋)
-                    _targetQteOffset = Mathf.Clamp(_targetQteOffset, minQteHeightOffset, maxQteHeightOffset);
-
-                    // 고도 보간 (갑자기 툭툭 튀지 않고 부드럽게 끙차 올라가고 떨어지도록 처리)
-                    _currentQteOffset = Mathf.Lerp(_currentQteOffset, _targetQteOffset, Time.deltaTime * heightSmoothSpeed);
-
-                    // ---------------------------------------------------------
-                    // 위치 및 흔들림 연산
-                    // ---------------------------------------------------------
-                    float currentFlatDistToTarget = GetHorizontalDistance(yenbeolTransform.position, target);
-                    float currentSegmentTravelledXZ = GetHorizontalDistance(segmentStartPos, yenbeolTransform.position);
-
-                    Vector3 steerDir = (target - yenbeolTransform.position);
-                    steerDir.y = 0;
-                    steerDir.Normalize();
-
-                    Vector3 rightVec = Vector3.Cross(Vector3.up, steerDir).normalized;
-                    if (rightVec == Vector3.zero) rightVec = Vector3.right;
-
-                    // 기본 선형 Y 고도
-                    float baseHeight = Mathf.Lerp(segmentStartPos.y, target.y, currentSegmentTravelledXZ / Mathf.Max(GetHorizontalDistance(segmentStartPos, target), 0.001f));
-
-                    // 비틀거림/무게감 노이즈
-                    float arrivalFade = Mathf.Clamp01(currentFlatDistToTarget / 1.0f);
-                    float verticalDip = -Mathf.Abs(Mathf.Sin(totalFlightTime * heavyDipSpeed)) * heavyDipAmount * arrivalFade;
-                    float horizontalWobble = Mathf.Sin(totalFlightTime * wobbleSpeed) * wobbleAmount * arrivalFade;
-
-                    // 최종 좌표 = 수평 이동 + 기본 Y + QTE 고도 오프셋 + 미세 진동
-                    float stepSize = Mathf.Min(flySpeed * Time.deltaTime, currentFlatDistToTarget);
-                    Vector3 nextBasePos = yenbeolTransform.position + (steerDir * stepSize);
-
-                    nextBasePos.y = baseHeight + _currentQteOffset + verticalDip;
-
-                    Vector3 finalPos = nextBasePos + (rightVec * horizontalWobble * Time.deltaTime * 5f);
-                    yenbeolTransform.position = finalPos;
-
-                    // 플레이어 동기화
-                    playerTransform.position = yenbeolTransform.position + carryOffset;
-
-                    // 회전 연출
-                    if (currentFlatDistToTarget > 0.3f)
-                    {
-                        Quaternion baseRot = Quaternion.LookRotation(steerDir);
-                        float tiltRoll = Mathf.Sin(totalFlightTime * wobbleSpeed) * maxTiltAngle * arrivalFade;
-                        float tiltPitch = Mathf.Cos(totalFlightTime * heavyDipSpeed) * (maxTiltAngle * 0.5f) * arrivalFade;
-                        Quaternion tiltRot = Quaternion.Euler(tiltPitch, 0f, tiltRoll);
-
-                        yenbeolTransform.rotation = Quaternion.Slerp(
-                            yenbeolTransform.rotation, baseRot * tiltRot, Time.deltaTime * 6f);
-                    }
-
-                    yield return null;
-                }
-
-                yenbeolTransform.position = target;
-                playerTransform.position = target + carryOffset;
-            }
-
-            // STEP 4: 복구
-            yield return null;
-
-            if (_playerRb != null)
-            {
-                _playerRb.isKinematic = _wasKinematic;
-                _playerRb.linearVelocity = Vector3.zero;
-                _playerRb.angularVelocity = Vector3.zero;
-            }
-
-            for (int i = scriptsToDisable.Count - 1; i >= 0; i--)
-            {
-                if (scriptsToDisable[i] != null)
-                    scriptsToDisable[i].enabled = true;
-            }
-
-            if (InputManager.Instance != null)
-            {
-                InputManager.Instance.enabled = true;
-            }
-
-            _carryCoroutine = null;
-            IsOn = true;
-        }
-
-        private float GetHorizontalDistance(Vector3 p1, Vector3 p2)
-        {
-            Vector2 v1 = new Vector2(p1.x, p1.z);
-            Vector2 v2 = new Vector2(p2.x, p2.z);
-            return Vector2.Distance(v1, v2);
-        }
-
-        public new void Reset()
-        {
-            base.Reset();
-            if (_carryCoroutine != null)
-            {
-                StopCoroutine(_carryCoroutine);
-                _carryCoroutine = null;
-            }
-        }
-    }
-}
-
-
-*/
-
-using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
-
-namespace _Project.Scripts.VisualScripting
-{
-    /// <summary>
-    /// Yenbeol(벌)이 무거운 플레이어를 들고 이동할 때, 
-    /// 스페이스바를 누르면 위로 솟구치고, 안 누르면 부드럽게 낙하하며
-    /// 절대 바닥을 뚫지 않고 질질 끌려가는 QTE Output.
-    /// </summary>
-    [AddComponentMenu("Visual Scripting/Outputs/벌 플레이어 운반 (부드러운 낙하 & 바닥 뚫림 완벽 방지 QTE)")]
-    public class BeeCarrySpaceMashOutput : ProcessBase
-    {
-        [Header("Bee Settings")]
-        [Tooltip("이동할 Yenbeol(벌) 오브젝트의 Transform")]
-        [SerializeField] private Transform yenbeolTransform;
-
-        [Header("Player Settings")]
-        [Tooltip("플레이어 루트 게임오브젝트")]
-        [SerializeField] private GameObject playerObject;
-
-        [Tooltip("비활성화할 플레이어 스크립트 목록 (PlayerLocomotion 등)")]
-        [SerializeField] private List<MonoBehaviour> scriptsToDisable = new List<MonoBehaviour>();
-
-        [Header("Path Settings")]
-        [Tooltip("목적지까지의 경유점 목록")]
-        [SerializeField] private List<Transform> waypoints = new List<Transform>();
-
-        [Tooltip("최종 목적지 Transform")]
-        [SerializeField] private Transform destination;
-
-        [Header("Flight Settings")]
-        [Tooltip("Yenbeol이 날아가는 기본 수평 속도 (m/s)")]
-        [SerializeField] private float flySpeed = 4f;
-
-        [Tooltip("도착 판정 수평 거리 (m)")]
-        [SerializeField] private float arrivalThreshold = 0.2f;
-
-        [Header("★ Space & Soft Gravity (부드러운 추락 & 솟구침)")]
-        [Tooltip("QTE에 사용할 키 (기본: Space)")]
-        [SerializeField] private KeyCode qteKey = KeyCode.Space;
-
-        [Tooltip("스페이스바 1회 누를 때 위로 솟구치는 힘 (Impulse)")]
-        [SerializeField] private float spaceImpulse = 4.0f;
-
-        [Tooltip("기본 중력 세기 (자연스러운 낙하감: 9.8 전후)")]
-        [SerializeField] private float gravity = 9.8f;
-
-        [Tooltip("하강 중일 때 적용할 추가 중력 배율 (1.2 ~ 1.4 추천)")]
-        [SerializeField] private float fallMultiplier = 1.3f;
-
-        [Tooltip("★ 최대 낙하 속도 제한 (이 수치 이상으로 확 떨어지지 않음)")]
-        [SerializeField] private float maxFallSpeed = 3.5f;
-
-        [Tooltip("스페이스바로 도달할 수 있는 최고 높이 오프셋 (m)")]
-        [SerializeField] private float maxQteHeightOffset = 2.0f;
-
-        [Header("★ Perfect Ground Protection (바닥 뚫림 100% 방지)")]
-        [Tooltip("체크 시 바닥 지형을 감지하여 플레이어가 땅을 뚫지 않도록 합니다.")]
-        [SerializeField] private bool preventGroundClipping = true;
-
-        [Tooltip("바닥으로 인식할 지형 LayerMask (Default, Ground 등)")]
-        [SerializeField] private LayerMask groundLayer;
-
-        [Tooltip("플레이어 발바닥 기준 추가 Y 오프셋 (0이면 발바닥이 바닥에 맞닿음)")]
-        [SerializeField] private float playerBottomOffset = 0.0f;
-
-        [Header("Heavy & Unstable Motion (위태로운 연출)")]
-        [Tooltip("무거워서 아래로 쳐지는 Y축 미세 진동 폭")]
-        [SerializeField] private float heavyDipAmount = 0.15f;
-
-        [Tooltip("고도 미세 진동 속도")]
-        [SerializeField] private float heavyDipSpeed = 8.0f;
-
-        [Tooltip("비틀거리는 좌우 흔들림 폭")]
-        [SerializeField] private float wobbleAmount = 0.2f;
-
-        [Tooltip("비틀거리는 좌우 흔들림 속도")]
-        [SerializeField] private float wobbleSpeed = 8.0f;
-
-        [Tooltip("몸체가 기울어지는 최대 각도")]
-        [SerializeField] private float maxTiltAngle = 12.0f;
-
-        // 내부 물리 상태
-        private Coroutine _carryCoroutine;
-        private Rigidbody _playerRb;
-        private bool _wasKinematic;
-        
-        private float _verticalVelocity = 0f;
-        private float _qteHeightOffset = 0f;
 
         public override void Execute()
         {
@@ -372,9 +125,28 @@ namespace _Project.Scripts.VisualScripting
             Transform playerTransform = playerObject.transform;
 
             // STEP 1: 입력 및 플레이어 움직임 잠금
+            List<MonoBehaviour> disabledScripts = new List<MonoBehaviour>();
             foreach (var script in scriptsToDisable)
             {
-                if (script != null) script.enabled = false;
+                if (script != null && script.enabled)
+                {
+                    script.enabled = false;
+                    disabledScripts.Add(script);
+                }
+            }
+
+            // 플레이어의 Locomotion / CharacterController 추가 비활성화
+            var locomotion = playerObject.GetComponent<PlayerLocomotion>();
+            if (locomotion != null && locomotion.enabled && !disabledScripts.Contains(locomotion))
+            {
+                locomotion.enabled = false;
+                disabledScripts.Add(locomotion);
+            }
+            CharacterController cc = playerObject.GetComponent<CharacterController>();
+            bool wasCcEnabled = cc != null && cc.enabled;
+            if (wasCcEnabled)
+            {
+                cc.enabled = false;
             }
 
             if (InputManager.Instance != null)
@@ -391,139 +163,167 @@ namespace _Project.Scripts.VisualScripting
                 _playerRb.isKinematic = true;
             }
 
+            // Locomotion/Physics 프레임 안정화 대기
             yield return null;
             yield return null;
+
+            if (initialInputDelay > 0f)
+            {
+                yield return new WaitForSeconds(initialInputDelay);
+            }
 
             // STEP 2: 잡은 시점 오프셋 고정
             Vector3 carryOffset = playerTransform.position - yenbeolTransform.position;
 
-            // STEP 3: 이동 경로 포인트 구성
-            List<Vector3> pathTargets = new List<Vector3>();
-            foreach (var wp in waypoints)
+            // STEP 3: 이동 경로 포인트 및 누적 길이 구성
+            List<Vector3> pathPoints = new List<Vector3>();
+            pathPoints.Add(yenbeolTransform.position);
+            if (waypoints != null)
             {
-                if (wp != null) pathTargets.Add(wp.position);
+                foreach (var wp in waypoints)
+                {
+                    if (wp != null) pathPoints.Add(wp.position);
+                }
             }
-            pathTargets.Add(destination.position);
+            pathPoints.Add(destination.position);
+
+            float totalPathLength = 0f;
+            float[] segmentLengths = new float[pathPoints.Count - 1];
+            for (int i = 0; i < pathPoints.Count - 1; i++)
+            {
+                segmentLengths[i] = Vector3.Distance(pathPoints[i], pathPoints[i + 1]);
+                totalPathLength += segmentLengths[i];
+            }
+            if (totalPathLength < 0.001f) totalPathLength = 0.001f;
+
+            // 유효 연타 횟수 계산
+            int effectivePressCount = requiredPressCount;
+            if (effectivePressCount <= 0)
+            {
+                effectivePressCount = Mathf.Max(1, Mathf.RoundToInt(totalPathLength / Mathf.Max(advanceDistancePerPress, 0.1f)));
+            }
 
             float totalFlightTime = 0f;
-            _verticalVelocity = 0f;
-            _qteHeightOffset = 0f;
+            float currentProgress = 0f;
+            float targetProgress = 0f;
+            int currentPressCount = 0;
 
-            foreach (Vector3 target in pathTargets)
+            float nudgeImpulse = 0f;
+            float tiltSign = 1f;
+
+            Vector3 currentForwardDir = (pathPoints[1] - pathPoints[0]).normalized;
+            if (currentForwardDir == Vector3.zero) currentForwardDir = yenbeolTransform.forward;
+
+            // ---------------------------------------------------------
+            // ★ 메인 QTE 루프: 연타 입력이 들어와야만 전진, 없으면 제자리 대기
+            // ---------------------------------------------------------
+            while (currentProgress < 1.0f)
             {
-                Vector3 segmentStartPos = yenbeolTransform.position;
+                if (yenbeolTransform == null || playerObject == null || destination == null) yield break;
 
-                while (GetHorizontalDistance(yenbeolTransform.position, target) > arrivalThreshold)
+                totalFlightTime += Time.deltaTime;
+
+                // 1. QTE 연타 입력 감지 (Space 키 등)
+                if (IsQtePressed())
                 {
-                    totalFlightTime += Time.deltaTime;
+                    currentPressCount++;
+                    targetProgress = Mathf.Clamp01((float)currentPressCount / effectivePressCount);
 
-                    // ---------------------------------------------------------
-                    // 1. 중력 하강 & 부드러운 최대 낙하 속도 제한
-                    // ---------------------------------------------------------
-                    if (Input.GetKeyDown(qteKey))
-                    {
-                        _verticalVelocity = spaceImpulse;
-                    }
-                    else
-                    {
-                        float currentGravity = (_verticalVelocity < 0f) ? (gravity * fallMultiplier) : gravity;
-                        _verticalVelocity -= currentGravity * Time.deltaTime;
+                    nudgeImpulse = 1.0f;  // 움찔 반동 트리거
+                    tiltSign = -tiltSign; // 좌우 비틀거림 방향 반전
 
-                        // ★ [핵심] 낙하 속도가 maxFallSpeed를 넘지 않도록 제한 (너무 팍 떨어지는 현상 방지)
-                        _verticalVelocity = Mathf.Max(_verticalVelocity, -maxFallSpeed);
-                    }
-
-                    // 수직 위치 갱신
-                    _qteHeightOffset += _verticalVelocity * Time.deltaTime;
-
-                    // 천장(최고 높이) 제한
-                    if (_qteHeightOffset > maxQteHeightOffset)
-                    {
-                        _qteHeightOffset = maxQteHeightOffset;
-                        if (_verticalVelocity > 0f) _verticalVelocity = 0f;
-                    }
-
-                    // ---------------------------------------------------------
-                    // 2. 수평 전진 및 기본 고도 연산
-                    // ---------------------------------------------------------
-                    float currentFlatDistToTarget = GetHorizontalDistance(yenbeolTransform.position, target);
-                    float currentSegmentTravelledXZ = GetHorizontalDistance(segmentStartPos, yenbeolTransform.position);
-
-                    Vector3 steerDir = (target - yenbeolTransform.position);
-                    steerDir.y = 0;
-                    steerDir.Normalize();
-
-                    Vector3 rightVec = Vector3.Cross(Vector3.up, steerDir).normalized;
-                    if (rightVec == Vector3.zero) rightVec = Vector3.right;
-
-                    float baseHeight = Mathf.Lerp(segmentStartPos.y, target.y, currentSegmentTravelledXZ / Mathf.Max(GetHorizontalDistance(segmentStartPos, target), 0.001f));
-
-                    float arrivalFade = Mathf.Clamp01(currentFlatDistToTarget / 1.0f);
-                    float verticalDip = -Mathf.Abs(Mathf.Sin(totalFlightTime * heavyDipSpeed)) * heavyDipAmount * arrivalFade;
-                    float horizontalWobble = Mathf.Sin(totalFlightTime * wobbleSpeed) * wobbleAmount * arrivalFade;
-
-                    float stepSize = Mathf.Min(flySpeed * Time.deltaTime, currentFlatDistToTarget);
-                    Vector3 nextBasePos = yenbeolTransform.position + (steerDir * stepSize);
-
-                    // 벌 및 플레이어 예상 고도
-                    nextBasePos.y = baseHeight + _qteHeightOffset + verticalDip;
-                    float expectedPlayerY = nextBasePos.y + carryOffset.y;
-
-                    // ---------------------------------------------------------
-                    // ★ 3. 절대 안전 상공 레이캐스트 (바닥 뚫림 100% 방지)
-                    // ---------------------------------------------------------
-                    if (preventGroundClipping)
-                    {
-                        // 플레이어 위치가 아닌 '안전한 기본 상공 고도(baseHeight + 5m)'에서 항상 아래로 레이를 쏨
-                        Vector3 rayStart = new Vector3(nextBasePos.x, baseHeight + 5.0f, nextBasePos.z);
-                        if (Physics.Raycast(rayStart, Vector3.down, out RaycastHit hitInfo, 15.0f, groundLayer))
-                        {
-                            float groundSurfaceY = hitInfo.point.y + playerBottomOffset;
-
-                            // 플레이어 발/몸통이 바닥보다 아래로 파묻히려고 하면
-                            if (expectedPlayerY < groundSurfaceY)
-                            {
-                                // 바닥 표면에 완벽하게 고정
-                                expectedPlayerY = groundSurfaceY;
-                                nextBasePos.y = expectedPlayerY - carryOffset.y;
-
-                                // 현재 바닥 고도 기준으로 오프셋 역계산 & 하강 속도 0 리셋
-                                _qteHeightOffset = nextBasePos.y - (baseHeight + verticalDip);
-                                if (_verticalVelocity < 0f)
-                                {
-                                    _verticalVelocity = 0f;
-                                }
-                            }
-                        }
-                    }
-
-                    // 위치 반영
-                    Vector3 finalPos = nextBasePos + (rightVec * horizontalWobble * Time.deltaTime * 5f);
-                    yenbeolTransform.position = finalPos;
-
-                    // 플레이어 위치 동기화 (바닥에 딱 맞닿은 채로 전진)
-                    playerTransform.position = yenbeolTransform.position + carryOffset;
-
-                    // 비틀거림 회전 연출
-                    if (currentFlatDistToTarget > 0.3f)
-                    {
-                        Quaternion baseRot = Quaternion.LookRotation(steerDir);
-                        float tiltRoll = Mathf.Sin(totalFlightTime * wobbleSpeed) * maxTiltAngle * arrivalFade;
-                        float tiltPitch = Mathf.Cos(totalFlightTime * heavyDipSpeed) * (maxTiltAngle * 0.5f) * arrivalFade;
-                        Quaternion tiltRot = Quaternion.Euler(tiltPitch, 0f, tiltRoll);
-
-                        yenbeolTransform.rotation = Quaternion.Slerp(
-                            yenbeolTransform.rotation, baseRot * tiltRot, Time.deltaTime * 6f);
-                    }
-
-                    yield return null;
+                    PlaySFX(qtePressSoundKey, yenbeolTransform.position);
                 }
 
-                yenbeolTransform.position = target;
-                playerTransform.position = target + carryOffset;
+                // 2. 움찔 반동 감쇠
+                if (nudgeImpulse > 0f)
+                {
+                    nudgeImpulse -= Time.deltaTime * nudgeRecoverySpeed;
+                    if (nudgeImpulse < 0f) nudgeImpulse = 0f;
+                }
+
+                // 3. 진행도(Progress) 보간 이동
+                // flySpeed(m/s)를 경로 전체 길이에 맞춰 속도로 변환
+                float progressSpeed = (flySpeed > 0f && totalPathLength > 0.001f)
+                    ? (flySpeed / totalPathLength)
+                    : 1.0f;
+
+                currentProgress = Mathf.MoveTowards(
+                    currentProgress, targetProgress, progressSpeed * moveSmoothSpeed * Time.deltaTime);
+
+                // 4. 경로 좌표 샘플링
+                Vector3 basePathPos = GetPointOnPath(pathPoints, segmentLengths, totalPathLength, currentProgress, out currentForwardDir);
+
+                // 5. 모션 연출 (움찔 들썩임 + 대기 중 호버링)
+                float arrivalFade = Mathf.Clamp01((1f - currentProgress) / 0.05f);
+
+                // 스페이스 연타 시 위로 끙차 솟구치는 Y 반동
+                float nudgeHop = Mathf.Sin(nudgeImpulse * Mathf.PI * 0.5f) * nudgeHopAmount * arrivalFade;
+
+                // 스페이스 연타 시 앞으로 고개 숙이는 피치 반동
+                float nudgePitch = nudgeImpulse * nudgeTiltAngle * arrivalFade;
+
+                // 입력 대기 시 제자리 날갯짓 호버링 / 처짐
+                float hoverDip = -Mathf.Abs(Mathf.Sin(totalFlightTime * heavyDipSpeed)) * heavyDipAmount * arrivalFade;
+                float hoverWobble = Mathf.Sin(totalFlightTime * wobbleSpeed) * wobbleAmount * arrivalFade;
+
+                Vector3 rightVec = Vector3.Cross(Vector3.up, currentForwardDir).normalized;
+                if (rightVec == Vector3.zero) rightVec = Vector3.right;
+
+                Vector3 nextPos = basePathPos;
+                nextPos.y += (nudgeHop + hoverDip);
+                nextPos += rightVec * (hoverWobble * tiltSign * 0.15f);
+
+                // 6. 바닥 충돌 방지 (Prevent Ground Clipping)
+                if (preventGroundClipping)
+                {
+                    float expectedPlayerY = nextPos.y + carryOffset.y;
+                    Vector3 rayStart = new Vector3(nextPos.x, basePathPos.y + 5.0f, nextPos.z);
+                    if (Physics.Raycast(rayStart, Vector3.down, out RaycastHit hitInfo, 15.0f, groundLayer))
+                    {
+                        float groundSurfaceY = hitInfo.point.y + playerBottomOffset;
+                        if (expectedPlayerY < groundSurfaceY)
+                        {
+                            float diff = groundSurfaceY - expectedPlayerY;
+                            nextPos.y += diff;
+                        }
+                    }
+                }
+
+                // 위치 반영
+                yenbeolTransform.position = nextPos;
+                playerTransform.position = nextPos + carryOffset;
+
+                // 7. 회전 연출
+                Vector3 flatForward = currentForwardDir;
+                flatForward.y = 0f;
+                if (flatForward.sqrMagnitude < 0.001f) flatForward = yenbeolTransform.forward;
+                flatForward.Normalize();
+
+                if (flatForward != Vector3.zero)
+                {
+                    Quaternion baseRot = Quaternion.LookRotation(flatForward);
+                    float tiltRoll = hoverWobble * maxTiltAngle * tiltSign;
+                    Quaternion dynamicRot = Quaternion.Euler(-nudgePitch, 0f, tiltRoll);
+
+                    yenbeolTransform.rotation = Quaternion.Slerp(
+                        yenbeolTransform.rotation, baseRot * dynamicRot, Time.deltaTime * 8.0f);
+                }
+
+                // 목표치에 도달하고 이동 보간도 완료되었는지 확인
+                float distToDest = Vector3.Distance(yenbeolTransform.position, destination.position);
+                if (currentProgress >= 0.999f && currentPressCount >= effectivePressCount && distToDest <= arrivalThreshold)
+                {
+                    break;
+                }
+
+                yield return null;
             }
 
-            // STEP 4: 복구
+            // STEP 4: 최종 목적지 안착 및 복구
+            yenbeolTransform.position = destination.position;
+            playerTransform.position = destination.position + carryOffset;
+
             yield return null;
 
             if (_playerRb != null)
@@ -533,10 +333,14 @@ namespace _Project.Scripts.VisualScripting
                 _playerRb.angularVelocity = Vector3.zero;
             }
 
-            for (int i = scriptsToDisable.Count - 1; i >= 0; i--)
+            foreach (var script in disabledScripts)
             {
-                if (scriptsToDisable[i] != null)
-                    scriptsToDisable[i].enabled = true;
+                if (script != null) script.enabled = true;
+            }
+
+            if (cc != null && wasCcEnabled)
+            {
+                cc.enabled = true;
             }
 
             if (InputManager.Instance != null)
@@ -548,16 +352,77 @@ namespace _Project.Scripts.VisualScripting
             IsOn = true;
         }
 
-        private float GetHorizontalDistance(Vector3 p1, Vector3 p2)
+        private bool IsQtePressed()
         {
-            Vector2 v1 = new Vector2(p1.x, p1.z);
-            Vector2 v2 = new Vector2(p2.x, p2.z);
-            return Vector2.Distance(v1, v2);
+            if (Input.GetKeyDown(qteKey)) return true;
+
+#if ENABLE_INPUT_SYSTEM
+            if (UnityEngine.InputSystem.Keyboard.current != null)
+            {
+                if (qteKey == KeyCode.Space && UnityEngine.InputSystem.Keyboard.current.spaceKey.wasPressedThisFrame) return true;
+                if (qteKey == KeyCode.Return && UnityEngine.InputSystem.Keyboard.current.enterKey.wasPressedThisFrame) return true;
+                if (qteKey == KeyCode.E && UnityEngine.InputSystem.Keyboard.current.eKey.wasPressedThisFrame) return true;
+                if (qteKey == KeyCode.F && UnityEngine.InputSystem.Keyboard.current.fKey.wasPressedThisFrame) return true;
+            }
+            if (UnityEngine.InputSystem.Gamepad.current != null)
+            {
+                if (UnityEngine.InputSystem.Gamepad.current.buttonSouth.wasPressedThisFrame) return true;
+            }
+#endif
+            return false;
+        }
+
+        private Vector3 GetPointOnPath(List<Vector3> pathPoints, float[] segmentLengths, float totalPathLength, float progress, out Vector3 forwardDir)
+        {
+            if (pathPoints == null || pathPoints.Count < 2)
+            {
+                forwardDir = (yenbeolTransform != null) ? yenbeolTransform.forward : Vector3.forward;
+                return (pathPoints != null && pathPoints.Count == 1) ? pathPoints[0] : Vector3.zero;
+            }
+
+            progress = Mathf.Clamp01(progress);
+            float targetDist = progress * totalPathLength;
+            float accumulated = 0f;
+
+            for (int i = 0; i < segmentLengths.Length; i++)
+            {
+                float segLen = segmentLengths[i];
+                if (accumulated + segLen >= targetDist || i == segmentLengths.Length - 1)
+                {
+                    float segProgress = (segLen > 0.0001f) ? Mathf.Clamp01((targetDist - accumulated) / segLen) : 1f;
+                    Vector3 diff = pathPoints[i + 1] - pathPoints[i];
+                    forwardDir = diff.normalized;
+                    if (forwardDir == Vector3.zero)
+                    {
+                        forwardDir = (yenbeolTransform != null) ? yenbeolTransform.forward : Vector3.forward;
+                    }
+                    return Vector3.Lerp(pathPoints[i], pathPoints[i + 1], segProgress);
+                }
+                accumulated += segLen;
+            }
+
+            forwardDir = (pathPoints[pathPoints.Count - 1] - pathPoints[pathPoints.Count - 2]).normalized;
+            return pathPoints[pathPoints.Count - 1];
+        }
+
+        private void PlaySFX(string soundKey, Vector3 position)
+        {
+            if (string.IsNullOrEmpty(soundKey) || SoundManager.Instance == null) return;
+            SoundManager.Instance.PlaySFX(soundKey, position);
         }
 
         public new void Reset()
         {
             base.Reset();
+            if (_carryCoroutine != null)
+            {
+                StopCoroutine(_carryCoroutine);
+                _carryCoroutine = null;
+            }
+        }
+
+        private void OnDisable()
+        {
             if (_carryCoroutine != null)
             {
                 StopCoroutine(_carryCoroutine);

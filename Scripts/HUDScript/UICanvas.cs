@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.EventSystems;
@@ -35,6 +35,10 @@ public class UICanvas : ManagerBase<UICanvas>
         "Title"
     };
 
+    [Header("Tab[Stay] Key Prompt Settings")]
+    [Tooltip("Tab[Stay]를 활성화할 씬 키워드 (기본값: RenewTutorialKST_2)")]
+    [SerializeField] private string tabStayActiveSceneKeyword = "RenewTutorialKST_2";
+
     private MenuManager _menuManager;
 
     protected override void Awake()
@@ -45,6 +49,7 @@ public class UICanvas : ManagerBase<UICanvas>
         if (instance != this) return;
 
         _menuManager = GetComponentInChildren<MenuManager>(true);
+        _menuManager?.SetupTopmostPanels();
         GetHUDObject();
     }
 
@@ -52,8 +57,13 @@ public class UICanvas : ManagerBase<UICanvas>
     {
         if (instance != this) return;
 
-        // 게임 시작 시 현재 씬에 맞춰 HUD 상태 최초 적용
-        UpdateHUDStateByScene(SceneManager.GetActiveScene().name);
+        if (_menuManager == null) _menuManager = GetComponentInChildren<MenuManager>(true);
+        _menuManager?.SetupTopmostPanels();
+
+        // 게임 시작 시 현재 씬에 맞춰 HUD 및 Tab[Stay] 상태 최초 적용
+        string activeScene = SceneManager.GetActiveScene().name;
+        UpdateHUDStateByScene(activeScene);
+        UpdateTabStayStateByScene(activeScene);
     }
 
     private void OnEnable()
@@ -85,8 +95,14 @@ public class UICanvas : ManagerBase<UICanvas>
             CloseAllPanels();
         }
 
+        if (_menuManager == null) _menuManager = GetComponentInChildren<MenuManager>(true);
+        _menuManager?.SetupTopmostPanels();
+
         // 씬 이름에 따라 HUD 자동 켜기/끄기
         UpdateHUDStateByScene(scene.name);
+
+        // 4__RenewTutorialKST_2 씬부터 Tab[Stay] 활성화 관리
+        UpdateTabStayStateByScene(scene.name);
     }
 
     /// <summary>
@@ -182,6 +198,79 @@ public class UICanvas : ManagerBase<UICanvas>
     }
 
     /// <summary>
+    /// 씬 이름에 맞춰 Tab[Stay] 활성화 여부를 관리합니다.
+    /// 4__RenewTutorialKST_2 씬(또는 키워드 포함 씬) 진입 시 활성화되며,
+    /// Lobby나 Tutorial 1로 돌아갔을 때는 비활성화합니다.
+    /// </summary>
+    public void UpdateTabStayStateByScene(string sceneName)
+    {
+        if (string.IsNullOrEmpty(sceneName)) return;
+
+        // Lobby나 Tutorial 1로 돌아갔을 때는 비활성화
+        if (sceneName.IndexOf("Lobby", System.StringComparison.OrdinalIgnoreCase) >= 0 ||
+            sceneName.IndexOf("RenewTutorialKST_1", System.StringComparison.OrdinalIgnoreCase) >= 0)
+        {
+            SetTabStayActive(false);
+            return;
+        }
+
+        // 4__RenewTutorialKST_2 씬부터 활성화
+        if (!string.IsNullOrEmpty(tabStayActiveSceneKeyword) &&
+            sceneName.IndexOf(tabStayActiveSceneKeyword, System.StringComparison.OrdinalIgnoreCase) >= 0)
+        {
+            SetTabStayActive(true);
+        }
+    }
+
+    /// <summary>
+    /// HUD 하위의 Tab[Stay] 오브젝트를 활성화하거나 비활성화합니다.
+    /// </summary>
+    public void SetTabStayActive(bool active)
+    {
+        GameObject hud = GetHUDObject();
+        if (hud == null) return;
+
+        Transform tabStay = hud.transform.Find("Tab[Stay]");
+        if (tabStay == null)
+        {
+            tabStay = FindChildRecursive(hud.transform, "Tab[Stay]");
+        }
+
+        if (tabStay != null)
+        {
+            if (tabStay.gameObject.activeSelf != active)
+            {
+                tabStay.gameObject.SetActive(active);
+                Debug.Log($"[UICanvas] Tab[Stay] {(active ? "활성화(ON)" : "비활성화(OFF)")} (씬: {SceneManager.GetActiveScene().name})");
+            }
+        }
+    }
+
+    /// <summary>
+    /// 어디서든 한 줄로 Tab[Stay]를 켜고 끌 수 있는 정적 메서드
+    /// 예: UICanvas.SetTabStay(true); 또는 UICanvas.SetTabStay(false);
+    /// </summary>
+    public static void SetTabStay(bool active)
+    {
+        if (instance != null)
+        {
+            instance.SetTabStayActive(active);
+        }
+        else
+        {
+            UICanvas found = Object.FindFirstObjectByType<UICanvas>(FindObjectsInactive.Include);
+            if (found != null)
+            {
+                found.SetTabStayActive(active);
+            }
+            else
+            {
+                Debug.LogWarning("[UICanvas] 씬에 UICanvas 인스턴스가 존재하지 않아 Tab[Stay]를 제어할 수 없습니다.");
+            }
+        }
+    }
+
+    /// <summary>
     /// 씬에 EventSystem이 없으면 생성하여 UI 클릭 및 내비게이션 입력을 보장합니다.
     /// </summary>
     private void EnsureEventSystemExists()
@@ -224,6 +313,16 @@ public class UICanvas : ManagerBase<UICanvas>
             if (_menuManager.quitConfirmationPanel != null && _menuManager.quitConfirmationPanel.activeSelf)
             {
                 _menuManager.quitConfirmationPanel.SetActive(false);
+            }
+
+            if (_menuManager.guidePanel != null && _menuManager.guidePanel.activeSelf)
+            {
+                _menuManager.guidePanel.SetActive(false);
+            }
+
+            if (_menuManager.diaryPanel != null && _menuManager.diaryPanel.activeSelf)
+            {
+                _menuManager.diaryPanel.SetActive(false);
             }
         }
     }

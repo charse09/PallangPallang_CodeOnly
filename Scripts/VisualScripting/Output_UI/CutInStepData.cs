@@ -47,6 +47,10 @@ namespace _Project.Scripts.VisualScripting.Output_UI
         public bool useFadeIn;
         public float fadeDuration = 1f;
 
+        [Tooltip("스텝 종료/퇴장 시 이미지를 페이드 아웃할지 여부")]
+        public bool useFadeOut;
+        public float fadeOutDuration = 0.5f;
+
         public bool useShake;
         public float shakeDuration = 0.5f;
         public float shakeIntensity = 20f;

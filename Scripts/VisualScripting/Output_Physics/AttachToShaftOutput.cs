@@ -4,122 +4,140 @@ using UnityEngine;
 namespace _Project.Scripts.VisualScripting
 {
     /// <summary>
-    /// ?�레?�어가 ?�역??진입?�면 ?�프?�에 밀�?고정?�어 말림 ?�전???�고,
-    /// ?�페?�스�?차징??0.0~1.0)???�라 Target 1 ~ Target 2 ?�이???�시�??�물??궤적??그리�?
-    /// 최고??2�?�?최�???2�??�서 머무르며 ?�복 충전?�는 ?�프 컴포?�트?�니??
+    /// 플레이어가 영역에 진입하면 샤프트에 밀착 고정되어 말림 회전을 하고,
+    /// 스페이스바 차징(0.0~1.0) 또는 외부 DismountTrigger 신호에 따라 
+    /// Target 1 ~ Target 2 사이의 실시간 포물선 궤적을 그리며 탈출하는 샤프트 컴포넌트입니다.
     /// </summary>
     public class AttachToShaftOutput : ProcessBase
     {
         private enum ChargePhase
         {
             Idle,
-            ChargingUp,     // 0% -> 100% (Target 1 -> Target 2 증�?)
-            HoldingMax,     // 100% 최�?치에??2�?머무�?
-            ReturningDown,  // 100% -> 0% (Target 2 -> Target 1 복�?)
-            HoldingMin      // 0% 최소치에??2�?머무�?-> ?�후 ?�충??
+            ChargingUp,     // 0% -> 100% (Target 1 -> Target 2 증가)
+            HoldingMax,     // 100% 최대치에서 2초 머무름
+            ReturningDown,  // 100% -> 0% (Target 2 -> Target 1 복귀)
+            HoldingMin      // 0% 최소치에서 2초 머무름 -> 이후 재충전
         }
 
         [Header("Shaft & Attachment Settings")]
-        [Tooltip("?�전?�는 ?�프???�통) Transform")]
+        [Tooltip("회전하는 샤프트(원통) Transform")]
         [SerializeField] private Transform shaftTransform;
 
-        [Tooltip("?�레?�어가 �?밀착하??말릴 고정 ?�치 (?�프???�식?�로 배치??Transform)")]
+        [Tooltip("플레이어가 밀착하여 말릴 고정 위치 (샤프트의 자식으로 배치할 Transform)")]
         [SerializeField] private Transform attachPoint;
 
-        [Tooltip("?�프?�의 길이/?�전 �?(보통 Local Right ?�는 Forward)")]
+        [Tooltip("샤프트의 길이/슬라이딩 축 (보통 Local Right 또는 Forward)")]
         [SerializeField] private Vector3 shaftLocalAxis = Vector3.right;
 
         [Header("Positioning & Snap Settings")]
-        [Tooltip("진입 ??attachPoint ?�치�??�식간에 보정?��? ?��?")]
+        [Tooltip("진입 시 attachPoint 위치로 즉시 보정(순간 이동)할지 여부")]
         [SerializeField] private bool snapToAttachPoint = true;
 
-        [Tooltip("snapToAttachPoint가 false????attachPoint ?�치�?부?�럽�??�동?�는 ?�간(�?")]
+        [Tooltip("snapToAttachPoint가 false일 때 attachPoint 위치로 부드럽게 이동하는 시간(초)")]
         [SerializeField] private float snapDuration = 0.15f;
 
         [Header("Slide Along Shaft Settings")]
-        [Tooltip("?�프?�에 매달�??�태?�서 �????�동 ?�용 ?��?")]
+        [Tooltip("샤프트에 매달린 상태에서 축을 따른 좌우 이동 허용 여부")]
         [SerializeField] private bool allowAxisSliding = true;
 
-        [Tooltip("�???조작 반�? ?��? (체크 ??A/D ??조작??반�?�???��??")]
+        [Tooltip("축 이동 조작 반전 여부 (체크 시 A/D 등 조작이 반대로 적용됨)")]
         [SerializeField] private bool invertControls = false;
 
-        [Tooltip("�????�라?�딩 ?�동 ?�도")]
+        [Tooltip("축을 따른 슬라이딩 이동 속도")]
         [SerializeField] private float slideSpeed = 6.0f;
 
-        [Tooltip("AttachPoint 기�? ?�쪽(-)?�로 ?�동 가?�한 최�? 거리")]
+        [Tooltip("AttachPoint 기준 왼쪽(-)으로 이동 가능한 최대 거리")]
         [SerializeField] private float leftSlideDistance = 3.0f;
 
-        [Tooltip("AttachPoint 기�? ?�른�?+)?�로 ?�동 가?�한 최�? 거리")]
+        [Tooltip("AttachPoint 기준 오른쪽(+)으로 이동 가능한 최대 거리")]
         [SerializeField] private float rightSlideDistance = 3.0f;
 
         [Header("Animation & Rotation Settings")]
-        [Tooltip("말림 ?�전 ?�니메이???�도 배율 (기본�? 1.0)")]
+        [Tooltip("말림 회전 애니메이션 속도 배율 (기본값 1.0)")]
         [SerializeField] private float rollAnimSpeed = 1.5f;
 
-        [Tooltip("Animator?�서 말림 ?�니메이???�어???�용??Bool ?�라미터 ?�름")]
+        [Tooltip("Animator에서 말림 애니메이션 제어에 사용할 Bool 파라미터 이름")]
         [SerializeField] private string rollAnimParamName = "IsWindRolling";
 
         [Header("Key & Charge Settings")]
-        [Tooltip("?�프/차징???�용????(기본�? Space)")]
+        [Tooltip("점프/차징에 사용할 키 (기본값 Space)")]
         [SerializeField] private KeyCode dismountKey = KeyCode.Space;
 
-        [Tooltip("Target 1?�서 Target 2(최�?�?까�? ?�달?�는 차징 ?�간(�?")]
+        [Tooltip("Target 1에서 Target 2(최대치)까지 도달하는 차징 시간(초)")]
         [SerializeField] private float chargeTimeThreshold = 1.0f;
 
-        [Tooltip("최�?�?Target 2)???�달?�을 ??최고?�에??머무르는 ?�간(�?")]
+        [Tooltip("최대치(Target 2)에 도달했을 때 최고점에서 머무르는 시간(초)")]
         [SerializeField] private float maxHoldDuration = 2.0f;
 
-        [Tooltip("최�?치에???�시 Target 1(0%)?�로 ?�르�??�돌?�오???�간(�?")]
+        [Tooltip("최대치에서 다시 Target 1(0%)으로 빠르게 되돌아오는 시간(초)")]
         [SerializeField] private float returnDuration = 0.75f;
 
-        [Tooltip("최소�?Target 1)�??�돌?�왔????최�??�에??머무르는 ?�간(�?")]
+        [Tooltip("최소치(Target 1)로 되돌아왔을 때 최저점에서 머무르는 시간(초)")]
         [SerializeField] private float minHoldDuration = 2.0f;
 
-        [Tooltip("최�????��???계속 ?�르�??�을 ???�시 충전??반복(Loop)?��? ?��?")]
+        [Tooltip("최저점에 도달한 뒤에도 키를 계속 누르고 있을 때 충전을 반복(Loop)할지 여부")]
         [SerializeField] private bool loopCharge = true;
 
-        [Header("Target 1 Settings (Tap / Min - 최소 ?�치)")]
-        [Tooltip("차징 0%?????�아�?1�?기본 목표 ?�치")]
+        [Header("Audio Settings (SFX)")]
+        [Tooltip("Roll(말림) 상태일 때 루프로 재생할 SO_SFXTable 키값")]
+        [SerializeField] private string rollLoopSfxKey = "";
+
+        [Tooltip("DismountKey를 누른 순간(차징 시작) 재생할 SO_SFXTable 키값")]
+        [SerializeField] private string dismountKeyDownSfxKey = "";
+
+        [Tooltip("차징 종료 후 점프 발사 시 재생할 SO_SFXTable 키값 (선택 사항)")]
+        [SerializeField] private string dismountLaunchSfxKey = "";
+
+        [Header("Dismount Trigger Settings")]
+        [Tooltip("지정한 외부 ProcessBase(트리거/Output 노드)의 IsOn이 true가 되면 자동으로 점프/탈출합니다.")]
+        [SerializeField] private ProcessBase dismountTrigger;
+
+        [Tooltip("트리거 신호로 탈출할 때 적용할 차징 비율 (0.0 = Target 1, 1.0 = Target 2 / 차징 중 트리거 도달 시 현재 차징값 우선)")]
+        [Range(0f, 1f)]
+        [SerializeField] private float triggerDismountRatio = 0f;
+
+        [Header("Target 1 Settings (Tap / Min - 최소 위치)")]
+        [Tooltip("차징 0%일 때 날아갈 1차 기본 목표 위치")]
         [SerializeField] private Transform target1Transform;
 
-        [Tooltip("1�?목표 ?�프 최고 ?�이")]
+        [Tooltip("1차 목표 점프 최고 높이")]
         [SerializeField] private float target1JumpHeight = 3.0f;
 
-        [Tooltip("1�?목표 ?�치까�? ?�아가???�요 ?�간(�?")]
+        [Tooltip("1차 목표 위치까지 날아가는 데 소요되는 시간(초)")]
         [SerializeField] private float target1JumpDuration = 0.8f;
 
-        [Header("Target 2 Settings (Max - 최�? ?�치)")]
-        [Tooltip("차징 100%?????�아�?2�?최�? 목표 ?�치")]
+        [Header("Target 2 Settings (Max - 최대 위치)")]
+        [Tooltip("차징 100%일 때 날아갈 2차 최대 목표 위치")]
         [SerializeField] private Transform target2Transform;
 
-        [Tooltip("2�?목표 ?�프 최고 ?�이")]
+        [Tooltip("2차 목표 점프 최고 높이")]
         [SerializeField] private float target2JumpHeight = 5.0f;
 
-        [Tooltip("2�?목표 ?�치까�? ?�아가???�요 ?�간(�?")]
+        [Tooltip("2차 목표 위치까지 날아가는 데 소요되는 시간(초)")]
         [SerializeField] private float target2JumpDuration = 1.0f;
 
         [Header("Trajectory Parabola Line Settings")]
-        [Tooltip("?�동 ?�산???�물??궤적??그려�?LineRenderer 컴포?�트")]
+        [Tooltip("실시간 계산된 포물선 궤적을 그려줄 LineRenderer 컴포넌트")]
         [SerializeField] private LineRenderer trajectoryLine;
 
-        [Tooltip("?�물??궤적 가?�드?�인 ?�성???��?")]
+        [Tooltip("포물선 궤적 가이드라인 활성화 여부")]
         [SerializeField] private bool showTrajectory = true;
 
-        [Tooltip("?�물??궤적 곡선???�상??(??개수)")]
+        [Tooltip("포물선 궤적 곡선의 해상도 (점 개수)")]
         [SerializeField] private int trajectoryResolution = 25;
 
         [Header("Jump Particle Settings (Optional)")]
-        [Tooltip("?�프 발사 ???�폰???�티???�리??(?? DustExplosion 1)")]
+        [Tooltip("점프 발사 시 스폰할 파티클 프리팹 (예: DustExplosion 1)")]
         [SerializeField] private GameObject jumpParticlePrefab;
 
         [Header("Charge Visual Effect Settings (Optional)")]
-        [Tooltip("차징 ??성?될 ?펙??게임?브?트")]
+        [Tooltip("차징 중 활성화될 이펙트 게임오브젝트")]
         [SerializeField] private GameObject chargeEffectObject;
 
         [Tooltip("차징 중 재생할 파티클 시스템")]
         [SerializeField] private ParticleSystem chargeParticleSystem;
 
-        [Tooltip("?레?어 ?브?트 (비워??경우 ?동 ?색)")]
+        [Tooltip("플레이어 오브젝트 (비워둘 경우 자동 검색)")]
         [SerializeField] private PlayerLocomotion locomotion;
 
         private Coroutine _rollCoroutine;
@@ -130,17 +148,44 @@ namespace _Project.Scripts.VisualScripting
         private bool _wasJumpRequested = false;
         private float _currentSlideOffset = 0f;
 
-        // 차징 ?�이???�어 변??
+        // 차징 사이클 제어 변수
         private ChargePhase _chargePhase = ChargePhase.Idle;
         private float _phaseTimer = 0f;
         private float _currentChargeRatio = 0f;
         private float _finalJumpRatio = 0f;
 
+        // Roll 지속 사운드 전용 AudioSource
+        private AudioSource _rollLoopAudioSource;
+
+        private void Awake()
+        {
+            InitRollAudioSource();
+        }
+
+        private void InitRollAudioSource()
+        {
+            if (_rollLoopAudioSource == null)
+            {
+                _rollLoopAudioSource = gameObject.AddComponent<AudioSource>();
+                _rollLoopAudioSource.playOnAwake = false;
+                _rollLoopAudioSource.loop = true;
+                _rollLoopAudioSource.rolloffMode = AudioRolloffMode.Linear;
+                _rollLoopAudioSource.minDistance = 5.0f;
+                _rollLoopAudioSource.maxDistance = 50.0f;
+                _rollLoopAudioSource.dopplerLevel = 0f;
+
+                if (AudioManager.Instance != null)
+                {
+                    _rollLoopAudioSource.outputAudioMixerGroup = AudioManager.Instance.SfxGroup;
+                }
+            }
+        }
+
         private void Update()
         {
             if (!_isAttached) return;
 
-            // 1. 차징 ?�작
+            // 1. 차징 시작 (DismountKey를 누른 시점)
             if (Input.GetKeyDown(dismountKey))
             {
                 _isCharging = true;
@@ -148,15 +193,21 @@ namespace _Project.Scripts.VisualScripting
                 _phaseTimer = 0f;
                 _currentChargeRatio = 0f;
                 SetChargeEffectState(true);
+
+                // DismountKey 입력 사운드 출력
+                if (!string.IsNullOrEmpty(dismountKeyDownSfxKey) && SoundManager.Instance != null)
+                {
+                    SoundManager.Instance.PlaySFX(dismountKeyDownSfxKey, transform.position);
+                }
             }
 
-            // 2. 차징 ?�이??(증�? -> 2�?최고???��?-> 감소 -> 2�?최�????��?-> 루프)
+            // 2. 차징 사이클 (증가 -> 2초 최고점 유지 -> 감소 -> 2초 최저점 유지 -> 루프)
             if (_isCharging && Input.GetKey(dismountKey))
             {
                 UpdateChargeCycle();
             }
 
-            // 3. ?�을 ?� ?�간???�확??비율�?발사
+            // 3. 키를 뗐을 때 해당 시점의 정확한 비율로 발사
             if (_isCharging && Input.GetKeyUp(dismountKey))
             {
                 _isCharging = false;
@@ -175,7 +226,6 @@ namespace _Project.Scripts.VisualScripting
             switch (_chargePhase)
             {
                 case ChargePhase.ChargingUp:
-                    // 0% -> 100% 증�?
                     float upDuration = Mathf.Max(0.01f, chargeTimeThreshold);
                     _currentChargeRatio = Mathf.Clamp01(_phaseTimer / upDuration);
 
@@ -188,7 +238,6 @@ namespace _Project.Scripts.VisualScripting
                     break;
 
                 case ChargePhase.HoldingMax:
-                    // 최고??Target 2)?�서 2.0�??��?
                     _currentChargeRatio = 1.0f;
 
                     if (_phaseTimer >= maxHoldDuration)
@@ -199,7 +248,6 @@ namespace _Project.Scripts.VisualScripting
                     break;
 
                 case ChargePhase.ReturningDown:
-                    // 100% -> 0%�?복�?
                     float downDuration = Mathf.Max(0.01f, returnDuration);
                     _currentChargeRatio = Mathf.Clamp01(1.0f - (_phaseTimer / downDuration));
 
@@ -212,7 +260,6 @@ namespace _Project.Scripts.VisualScripting
                     break;
 
                 case ChargePhase.HoldingMin:
-                    // 최�???Target 1)?�서 2.0�??��?
                     _currentChargeRatio = 0f;
 
                     if (_phaseTimer >= minHoldDuration)
@@ -261,7 +308,6 @@ namespace _Project.Scripts.VisualScripting
             CheckAndStartRoll(other);
         }
 
-        // ★ 추가: MoveTo가 끝나면서 isRidingRail이 뒤늦게 false가 되어도 즉시 감지
         private void OnTriggerStay(Collider other)
         {
             CheckAndStartRoll(other);
@@ -269,7 +315,6 @@ namespace _Project.Scripts.VisualScripting
 
         private void CheckAndStartRoll(Collider other)
         {
-            // 이미 붙어있거나 동작 코루틴이 도는 중이면 무시
             if (_isAttached || _rollCoroutine != null) return;
 
             PlayerLocomotion player = other.GetComponentInParent<PlayerLocomotion>();
@@ -330,7 +375,7 @@ namespace _Project.Scripts.VisualScripting
                 }
             }
 
-            if (visuals != null) visuals.SetWindRollAnim(true, rollAnimSpeed);
+            if (visuals != null) visuals.SetWindRollAnim(true);
             if (animator != null && !string.IsNullOrEmpty(rollAnimParamName))
             {
                 animator.SetBool(rollAnimParamName, true);
@@ -344,15 +389,31 @@ namespace _Project.Scripts.VisualScripting
             _currentChargeRatio = 0f;
             _finalJumpRatio = 0f;
 
+            // ★ Roll 상태 진입 시 SFX 루프 시작
+            PlayRollLoopAudio();
+
             Vector3 worldAxis = shaftTransform != null
                 ? shaftTransform.TransformDirection(shaftLocalAxis).normalized
                 : Vector3.right;
 
+            // 진입 시 외부 트리거의 잔여 IsOn 값으로 인해 즉각 발사되는 현상을 방지
+            yield return new WaitForFixedUpdate();
+
             while (true)
             {
+                // 키 릴리즈로 인한 탈출 요청 확인
                 if (_wasJumpRequested)
                 {
                     _wasJumpRequested = false;
+                    break;
+                }
+
+                // 외부 ProcessBase 트리거 신호 확인
+                if (dismountTrigger != null && dismountTrigger.IsOn)
+                {
+                    _finalJumpRatio = _isCharging ? _currentChargeRatio : triggerDismountRatio;
+                    _isCharging = false;
+                    _chargePhase = ChargePhase.Idle;
                     break;
                 }
 
@@ -387,6 +448,9 @@ namespace _Project.Scripts.VisualScripting
             SetChargeEffectState(false);
             DisableTrajectoryPreview();
 
+            // ★ Roll 상태 해제 시 SFX 루프 정지
+            StopRollLoopAudio();
+
             if (shaftTransform != null)
             {
                 Collider shaftCollider = shaftTransform.GetComponent<Collider>();
@@ -401,6 +465,75 @@ namespace _Project.Scripts.VisualScripting
 
             _rollCoroutine = null;
             IsOn = true;
+        }
+
+        #region --- Audio Helper Methods ---
+
+        private void PlayRollLoopAudio()
+        {
+            if (string.IsNullOrEmpty(rollLoopSfxKey) || SoundManager.Instance == null) return;
+
+            InitRollAudioSource();
+
+            // SoundManager의 sfxTable에 등록된 데이터 조회
+            if (SoundManager.Instance.TryGetSFXData(rollLoopSfxKey, out SFXData sfxData))
+            {
+                if (sfxData.clip == null) return;
+
+                if (AudioManager.Instance != null)
+                {
+                    _rollLoopAudioSource.outputAudioMixerGroup = AudioManager.Instance.SfxGroup;
+                }
+
+                _rollLoopAudioSource.clip = sfxData.clip;
+                _rollLoopAudioSource.volume = sfxData.volume;
+                _rollLoopAudioSource.pitch = sfxData.pitch;
+                _rollLoopAudioSource.spatialBlend = sfxData.is3D ? 1f : 0f;
+                _rollLoopAudioSource.loop = true;
+                _rollLoopAudioSource.Play();
+            }
+            else
+            {
+                Debug.LogWarning($"[AttachToShaftOutput] Roll 루프 SFX 키 '{rollLoopSfxKey}'를 SFX 테이블에서 찾을 수 없습니다.");
+            }
+        }
+
+        private void StopRollLoopAudio()
+        {
+            if (_rollLoopAudioSource != null && _rollLoopAudioSource.isPlaying)
+            {
+                _rollLoopAudioSource.Stop();
+                _rollLoopAudioSource.clip = null;
+            }
+        }
+
+        private void OnDisable()
+        {
+            StopRollLoopAudio();
+        }
+
+        #endregion
+
+        /// <summary>
+        /// 외부 스크립트 또는 이벤트에서 임의로 샤프트에서 강제 발사/탈출시킬 때 호출합니다.
+        /// </summary>
+        public void Detach(float customRatio = -1f)
+        {
+            if (!_isAttached) return;
+
+            if (customRatio >= 0f)
+            {
+                _finalJumpRatio = Mathf.Clamp01(customRatio);
+            }
+            else
+            {
+                _finalJumpRatio = _isCharging ? _currentChargeRatio : triggerDismountRatio;
+            }
+
+            _isCharging = false;
+            _chargePhase = ChargePhase.Idle;
+            SetChargeEffectState(false);
+            _wasJumpRequested = true;
         }
 
         private void UpdateTrajectoryPreview(Vector3 startPos)
@@ -468,6 +601,12 @@ namespace _Project.Scripts.VisualScripting
                 Vector3 endPos = Vector3.Lerp(p1, p2, jumpRatio);
                 float selectedHeight = Mathf.Lerp(target1JumpHeight, target2JumpHeight, jumpRatio);
                 float selectedDuration = Mathf.Lerp(target1JumpDuration, target2JumpDuration, jumpRatio);
+
+                // 발사 효과음 출력 (지정된 경우)
+                if (!string.IsNullOrEmpty(dismountLaunchSfxKey) && SoundManager.Instance != null)
+                {
+                    SoundManager.Instance.PlaySFX(dismountLaunchSfxKey, startPos);
+                }
 
                 if (jumpParticlePrefab != null)
                 {

@@ -6,6 +6,7 @@ namespace _Project.Scripts.VisualScripting
 {
     /// <summary>
     /// 입력 신호를 받으면 지정한 착지 지점 리스트를 순서대로 탱탱볼처럼 통! 통! 튀어가며 이동하는 Output 컴포넌트.
+    /// 모든 리스트 이동을 완료했을 때 오브젝트를 사라지게(비활성화) 할지 선택할 수 있습니다.
     /// </summary>
     public class TongTongListJump : ProcessBase
     {
@@ -38,6 +39,16 @@ namespace _Project.Scripts.VisualScripting
         [Tooltip("땅에 닿을 때 재생할 효과음 (AudioSource 컴포넌트 필요)")]
         [SerializeField] private AudioClip landSfx;
 
+        [Header("Completion Settings (완주 후 처리)")]
+        [Tooltip("★ 체크 시 리스트의 모든 지점을 다 돌고 난 뒤 오브젝트를 사라지게(비활성화) 합니다.")]
+        [SerializeField] private bool disappearOnComplete = false;
+
+        [Tooltip("마지막 지점 착지 후 사라지기까지의 대기 시간(초). 마지막 착지 찌그러짐 연출을 보여주기 위해 0.1~0.2초 권장.")]
+        [SerializeField] private float disappearDelay = 0.15f;
+
+        [Tooltip("체크 시 비활성화(SetActive false) 대신 씬에서 완전히 삭제(Destroy)합니다.")]
+        [SerializeField] private bool destroyInsteadOfDeactivate = false;
+
         private AudioSource _audioSource;
         private Vector3 _originalScale;
         private Coroutine _bounceCoroutine;
@@ -59,6 +70,12 @@ namespace _Project.Scripts.VisualScripting
                 Debug.LogWarning($"[{gameObject.name}] ballTransform이 없거나 착지 지점(landingPoints)이 비어있습니다.");
                 IsOn = false;
                 return;
+            }
+
+            // 시작 전 오브젝트 활성화 보장
+            if (!ballTransform.gameObject.activeSelf)
+            {
+                ballTransform.gameObject.SetActive(true);
             }
 
             if (_bounceCoroutine != null)
@@ -95,6 +112,24 @@ namespace _Project.Scripts.VisualScripting
                 startPos = targetPos;
             }
 
+            // ★ 완주 후 사라짐 처리
+            if (disappearOnComplete && ballTransform != null)
+            {
+                if (disappearDelay > 0f)
+                {
+                    yield return new WaitForSeconds(disappearDelay);
+                }
+
+                if (destroyInsteadOfDeactivate)
+                {
+                    Destroy(ballTransform.gameObject);
+                }
+                else
+                {
+                    ballTransform.gameObject.SetActive(false);
+                }
+            }
+
             // 모든 경로 이동 완주
             IsOn = true;
             _bounceCoroutine = null;
@@ -124,7 +159,6 @@ namespace _Project.Scripts.VisualScripting
                 // 탱탱볼 공중 늘어남 (Stretch) 연출
                 if (useSquashAndStretch)
                 {
-                    // t가 0.5(공중 최고점) 근처일 때 위아래로 살짝 늘어남
                     float stretchFactor = Mathf.Sin(t * Mathf.PI) * (squashAmount * 0.5f);
                     ballTransform.localScale = new Vector3(
                         _originalScale.x * (1f - stretchFactor),
@@ -146,39 +180,32 @@ namespace _Project.Scripts.VisualScripting
         /// </summary>
         private void OnLandImpact(Vector3 landPos)
         {
-            // 1. 착지 이펙트 생성
             if (landImpactFx != null)
             {
                 Instantiate(landImpactFx, landPos, Quaternion.identity);
             }
 
-            // 2. 착지 사운드 재생
             if (_audioSource != null && landSfx != null)
             {
                 _audioSource.PlayOneShot(landSfx);
             }
 
-            // 3. 착지 시 لحظ적인 찌그러짐 (Squash) 연출 코루틴
             if (useSquashAndStretch)
             {
                 StartCoroutine(SquashRoutine());
             }
         }
 
-        /// <summary>
-        /// 착지 직후 팽창/압축되는 찰나의 탱탱함 연출
-        /// </summary>
         private IEnumerator SquashRoutine()
         {
             float elapsed = 0f;
-            float duration = 0.1f; // 짧고 굵게 찌그러짐
+            float duration = 0.1f;
 
             while (elapsed < duration)
             {
                 elapsed += Time.deltaTime;
                 float t = elapsed / duration;
 
-                // 아래로 납작해지고 좌우로 뚱뚱해짐
                 float squashOffset = Mathf.Sin(t * Mathf.PI) * squashAmount;
                 ballTransform.localScale = new Vector3(
                     _originalScale.x * (1f + squashOffset),
@@ -190,6 +217,30 @@ namespace _Project.Scripts.VisualScripting
             }
 
             ballTransform.localScale = _originalScale;
+        }
+
+        public override void Reset()
+        {
+            base.Reset();
+
+            if (_bounceCoroutine != null)
+            {
+                StopCoroutine(_bounceCoroutine);
+                _bounceCoroutine = null;
+            }
+
+            if (ballTransform != null)
+            {
+                ballTransform.localScale = _originalScale;
+
+                // 사라졌던 오브젝트를 다시 살려서 재사용할 수 있도록 복구
+                if (disappearOnComplete && !destroyInsteadOfDeactivate)
+                {
+                    ballTransform.gameObject.SetActive(true);
+                }
+            }
+
+            IsOn = false;
         }
     }
 }

@@ -63,6 +63,9 @@ public class GameManager : ManagerBase<GameManager>
     [Tooltip("화면에 FPS 표시 여부")]
     [SerializeField] private bool showFpsGUI = true;
 
+    [Tooltip("FPS 표시 온/오프 단축키")]
+    [SerializeField] private KeyCode toggleFpsKey = KeyCode.F4; // 기본값 예시: F4
+
     [Tooltip("FPS 수치 측정/갱신 주기(초)")]
     [SerializeField] private float fpsUpdateInterval = 0.5f;
 
@@ -153,6 +156,12 @@ public class GameManager : ManagerBase<GameManager>
     private void Update()
     {
         UpdateFrameRateCounter();
+
+        // FPS 표시 토글 단축키 감지
+        if (Input.GetKeyDown(toggleFpsKey))
+        {
+            showFpsGUI = !showFpsGUI;
+        }
 
         if (enableSceneShortcuts)
         {

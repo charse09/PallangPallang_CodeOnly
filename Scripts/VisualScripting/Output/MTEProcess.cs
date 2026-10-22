@@ -24,6 +24,8 @@ namespace _Project.Scripts.VisualScripting
 
         private bool _isWaitingInput = false;
 
+        public bool IsWaitingInput => _isWaitingInput;
+
         public override void Execute()
         {
             if (_isWaitingInput) return;

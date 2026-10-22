@@ -22,9 +22,9 @@ namespace _Project.Scripts.VisualScripting
         {
             IsOn = false;
 
+            // 1. InputManager를 통한 입력 차단/허용 적용
             if (InputManager.Instance != null)
             {
-                // 선택한 입력들(다중 선택됨)을 모두 끄거나 켭니다.
                 InputManager.Instance.SetSpecificInput(targetInput, enableInput);
             }
             else
@@ -32,13 +32,14 @@ namespace _Project.Scripts.VisualScripting
                 Debug.LogWarning($"[{gameObject.name}] InputManager.Instance를 찾을 수 없습니다.");
             }
 
-            // 2. 물리 정지 처리 (조작을 막았고 물리 정지 옵션이 켜져 있으며, 선택 항목 중 'Movement'가 포함되어 있을 때)
-            if (!enableInput && stopPhysicsImmediately)
+            // 2. 입력 차단 시 즉시 상태/물리 정지 처리
+            if (!enableInput)
             {
-                if (targetInput.HasFlag(InputControlType.Movement))
+                var player = FindFirstObjectByType<PlayerLocomotion>();
+                if (player != null)
                 {
-                    var player = FindFirstObjectByType<PlayerLocomotion>();
-                    if (player != null)
+                    // 2-1. 이동(Movement) 차단 시 즉시 관성 제거
+                    if (stopPhysicsImmediately && targetInput.HasFlag(InputControlType.Movement))
                     {
                         Rigidbody rb = player.GetComponent<Rigidbody>();
                         if (rb != null)
@@ -46,6 +47,12 @@ namespace _Project.Scripts.VisualScripting
                             rb.linearVelocity = Vector3.zero;
                             rb.angularVelocity = Vector3.zero;
                         }
+                    }
+
+                    // 2-2. 슬라이드(Slide) 차단 시 현재 미끄러지는 중이면 즉시 중단
+                    if (targetInput.HasFlag(InputControlType.Slide))
+                    {
+                        player.StopSlide();
                     }
                 }
             }

@@ -40,6 +40,7 @@ namespace _Project.Scripts.VisualScripting
     /// <summary>
     /// 플레이어에게 단계별 '예/아니오' 질문을 제시하며,
     /// '예'를 누르면 즉시 해당 Output을 실행하고 UI 전체를 비활성화하는 노드입니다.
+    /// 사운드 키가 입력되어 있으면 SoundManager의 오브젝트 풀링을 통해 효과음을 출력합니다.
     /// </summary>
     public class YesNoChoiceOutput : ProcessBase
     {
@@ -63,8 +64,13 @@ namespace _Project.Scripts.VisualScripting
         [Tooltip("마우스를 올렸을 때 빛나는 틴트 색상")]
         [SerializeField] private Color yesGlowColor = new Color(1f, 0.92f, 0.4f, 1f);
 
-        [Header("3. No Button Global Settings")]
+        [Header("3. No Button Global Settings (붉게 빛나는 거절/실패 버튼)")]
         [SerializeField] private Button noButton;
+        [Tooltip("마우스를 올리거나 도망칠 때 붉게 번쩍이는 발광 틴트 색상")]
+        [SerializeField] private Color noGlowColor = new Color(1f, 0.28f, 0.28f, 1f);
+        [Tooltip("마우스를 올렸을 때의 펄스 확대 배율 (가만히 있을 때)")]
+        [SerializeField] private float noHoverScale = 1.12f;
+
         [Tooltip("도망칠 때 구역 가장자리 안쪽으로 남겨둘 패딩 여백")]
         [SerializeField] private float boundaryPadding = 40f;
 
@@ -74,12 +80,18 @@ namespace _Project.Scripts.VisualScripting
         [Tooltip("한 번 도망친 후 멈칫하는 쿨타임 (초) - 이 틈을 노려 잡을 수 있음 (0.15~0.25 추천)")]
         [SerializeField] private float fleeCooldown = 0.2f;
 
-        [Header("4. Sound Effects (Optional)")]
-        [SerializeField] private AudioSource audioSource;
-        [SerializeField] private AudioClip yesHoverSound;
-        [SerializeField] private AudioClip yesClickSound;
-        [SerializeField] private AudioClip noEscapeSound;
-        [SerializeField] private AudioClip noClickSound;
+        [Header("4. Audio Settings (SoundManager Pooling)")]
+        [Tooltip("'예' 버튼에 마우스를 올렸을 때 재생할 SFX 키 (비워둘 경우 무음)")]
+        [SerializeField] private string yesHoverSoundKey = "UI_Hover";
+
+        [Tooltip("'예' 버튼을 클릭했을 때 재생할 SFX 키 (비워둘 경우 무음)")]
+        [SerializeField] private string yesClickSoundKey = "UI_Click";
+
+        [Tooltip("'아니오' 버튼에 마우스를 올렸을 때(접근 시) 재생할 SFX 키 (비워둘 경우 무음)")]
+        [SerializeField] private string noHoverSoundKey = "UI_Hover";
+
+        [Tooltip("'아니오' 버튼을 클릭했을 때 재생할 SFX 키 (비워둘 경우 무음)")]
+        [SerializeField] private string noClickSoundKey = "UI_Click";
 
         [Header("5. Multi-Step Timeline (단계별 질문 & 난이도 설정)")]
         [SerializeField]
@@ -119,17 +131,12 @@ namespace _Project.Scripts.VisualScripting
 
         private void Awake()
         {
-            if (audioSource == null)
-                audioSource = GetComponent<AudioSource>();
-
             if (buttonBoundaryArea == null && noButton != null)
                 buttonBoundaryArea = noButton.transform.parent as RectTransform;
 
             SetupButtonComponents();
 
-            // 시작 시 UI 전체 비활성화
             SetUIActive(false);
-
             IsOn = false;
         }
 
@@ -141,7 +148,7 @@ namespace _Project.Scripts.VisualScripting
                 if (_shinyYes == null)
                     _shinyYes = yesButton.gameObject.AddComponent<ShinyHoverButton>();
 
-                _shinyYes.Setup(yesHoverScale, yesGlowColor, () => PlaySound(yesHoverSound));
+                _shinyYes.Setup(yesHoverScale, yesGlowColor, () => PlaySFX(yesHoverSoundKey));
                 yesButton.onClick.RemoveAllListeners();
                 yesButton.onClick.AddListener(OnYesClicked);
             }
@@ -160,7 +167,9 @@ namespace _Project.Scripts.VisualScripting
                     boundaryPadding,
                     detectionRadius,
                     fleeCooldown,
-                    () => PlaySound(noEscapeSound),
+                    noGlowColor,
+                    noHoverScale,
+                    () => PlaySFX(noHoverSoundKey),
                     OnNoClicked
                 );
 
@@ -219,33 +228,29 @@ namespace _Project.Scripts.VisualScripting
             }
         }
 
-        // ★ 언제든 '예'를 누르면 즉시 해당 Output을 쏘고 UI를 모두 끄며 시퀀스 종료
         private void OnYesClicked()
         {
-            PlaySound(yesClickSound);
+            PlaySFX(yesClickSoundKey);
 
             YesNoStep currentStep = (_currentStepIndex >= 0 && _currentStepIndex < questionSteps.Count)
                 ? questionSteps[_currentStepIndex]
                 : null;
 
-            // 1. 해당 스텝에 등록된 onYesProcess 실행
             if (currentStep != null && currentStep.onYesProcess.process != null)
             {
                 currentStep.onYesProcess.process.Reset();
                 currentStep.onYesProcess.process.Execute();
             }
 
-            // 2. 다음 질문으로 넘어가지 않고 즉시 패널/캔버스 비활성화 및 프로세스 완료 처리
             FinishSequence();
         }
 
-        // '아니오'를 누르면 해당 스텝의 onNoProcess를 실행하고 다음 단계로 진행
         public void OnNoClicked()
         {
             if (Time.unscaledTime - _lastClickTime < 0.25f) return;
             _lastClickTime = Time.unscaledTime;
 
-            PlaySound(noClickSound);
+            PlaySFX(noClickSoundKey);
 
             YesNoStep currentStep = questionSteps[_currentStepIndex];
 
@@ -287,22 +292,21 @@ namespace _Project.Scripts.VisualScripting
 
         private void FinishSequence()
         {
-            // UI 캔버스 및 패널 모두 비활성화
             SetUIActive(false);
-
-            // IsOn을 켜서 상위 시퀀스가 다음 노드로 진행할 수 있도록 플래그 설정
             IsOn = true;
         }
 
-        private void PlaySound(AudioClip clip)
+        private void PlaySFX(string soundKey)
         {
-            if (audioSource != null && clip != null)
-                audioSource.PlayOneShot(clip);
+            if (!string.IsNullOrEmpty(soundKey) && SoundManager.Instance != null)
+            {
+                SoundManager.Instance.PlaySFX(soundKey);
+            }
         }
     }
 
     // =========================================================================
-    // 마우스를 올리면 두근거리며 빛나는 '예' 버튼 헬퍼
+    // 마우스를 올리면 두근거리며 노랗게 빛나는 '예' 버튼 헬퍼
     // =========================================================================
     public class ShinyHoverButton : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler
     {
@@ -351,20 +355,32 @@ namespace _Project.Scripts.VisualScripting
                 _targetGraphic.color = Color.Lerp(_originalColor, _glowColor, pulse);
             }
         }
+
+        private void OnDisable()
+        {
+            _isHovered = false;
+            transform.localScale = _originalScale;
+            if (_targetGraphic != null) _targetGraphic.color = _originalColor;
+        }
     }
 
     // =========================================================================
-    // 질문 단계에 맞춰 크기와 속도가 조절되며, 마우스 누름 즉시 클릭 판정을 처리하는 아니오 버튼
+    // 질문 단계에 맞춰 도망치며, 호버 시 붉은색으로 발광 및 호버 사운드를 1회만 재생하는 '아니오' 버튼
     // =========================================================================
-    public class StepProgressiveRunawayButton : MonoBehaviour, IPointerEnterHandler, IPointerDownHandler
+    public class StepProgressiveRunawayButton : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler, IPointerDownHandler
     {
         private Button _button;
         private RectTransform _rect;
         private RectTransform _boundaryArea;
+        private Graphic _graphic;
+        private Color _originalColor;
+        private Color _glowColor;
+        private float _hoverScale;
+
         private float _padding;
         private float _detectionRadius;
         private float _fleeCooldown;
-        private Action _onEscapeSound;
+        private Action _onHoverSound;
         private Action _onDirectClick;
 
         private bool _runsAway = false;
@@ -373,6 +389,11 @@ namespace _Project.Scripts.VisualScripting
         private Vector3 _initialBaseScale;
         private Vector2 _targetAnchoredPos;
         private float _cooldownTimer = 0f;
+        private bool _isHovered = false;
+        private float _fleeFlashTimer = 0f;
+
+        // 마우스가 머무는 동안 효과음 중복 발생 방지 플래그
+        private bool _hasPlayedHoverSound = false;
 
         public void Setup(
             Button button,
@@ -380,7 +401,9 @@ namespace _Project.Scripts.VisualScripting
             float padding,
             float detectionRadius,
             float fleeCooldown,
-            Action onEscapeSound,
+            Color glowColor,
+            float hoverScale,
+            Action onHoverSound,
             Action onDirectClick)
         {
             _button = button;
@@ -389,11 +412,19 @@ namespace _Project.Scripts.VisualScripting
             _padding = padding;
             _detectionRadius = detectionRadius;
             _fleeCooldown = fleeCooldown;
-            _onEscapeSound = onEscapeSound;
+            _glowColor = glowColor;
+            _hoverScale = hoverScale;
+            _onHoverSound = onHoverSound;
             _onDirectClick = onDirectClick;
 
             _initialBaseScale = _rect.localScale;
             _targetAnchoredPos = _rect.anchoredPosition;
+
+            _graphic = GetComponent<Graphic>();
+            if (_graphic != null)
+            {
+                _originalColor = _graphic.color;
+            }
         }
 
         public void ApplyStepConfiguration(bool runsAway, float scaleRatio, float speed)
@@ -402,16 +433,24 @@ namespace _Project.Scripts.VisualScripting
             _targetScaleRatio = scaleRatio;
             _speed = speed;
             _cooldownTimer = 0f;
+            _fleeFlashTimer = 0f;
+            _hasPlayedHoverSound = false;
+            RestoreColor();
         }
 
         public void ResetPosition(Vector2 defaultPos)
         {
             _targetAnchoredPos = defaultPos;
             _cooldownTimer = 0f;
+            _fleeFlashTimer = 0f;
+            _isHovered = false;
+            _hasPlayedHoverSound = false;
+
             if (_rect != null)
             {
                 _rect.anchoredPosition = defaultPos;
             }
+            RestoreColor();
         }
 
         public void OnPointerDown(PointerEventData eventData)
@@ -424,26 +463,82 @@ namespace _Project.Scripts.VisualScripting
 
         public void OnPointerEnter(PointerEventData eventData)
         {
-            if (!_runsAway || _cooldownTimer > 0f) return;
-            FleeToFurthestPoint();
+            _isHovered = true;
+            PlayHoverSoundOnce();
+
+            if (_runsAway && _cooldownTimer <= 0f)
+            {
+                FleeToFurthestPoint();
+            }
+        }
+
+        public void OnPointerExit(PointerEventData eventData)
+        {
+            _isHovered = false;
+
+            // 도망치지 않는 1단계에서는 버튼 밖으로 벗어났을 때 즉시 다음 호버를 위해 플래그 초기화
+            if (!_runsAway)
+            {
+                _hasPlayedHoverSound = false;
+            }
+        }
+
+        private void PlayHoverSoundOnce()
+        {
+            if (_hasPlayedHoverSound) return;
+            _hasPlayedHoverSound = true;
+            _onHoverSound?.Invoke();
         }
 
         private void Update()
         {
             if (_rect == null) return;
 
+            // 1. 크기(스케일) 연산
+            float finalScaleMultiplier = _targetScaleRatio;
+            if (_isHovered && !_runsAway)
+            {
+                float pulse = Mathf.Sin(Time.unscaledTime * 8f) * 0.5f + 0.5f;
+                finalScaleMultiplier *= Mathf.Lerp(1.0f, _hoverScale, pulse);
+            }
+
             _rect.localScale = Vector3.Lerp(
                 _rect.localScale,
-                _initialBaseScale * _targetScaleRatio,
+                _initialBaseScale * finalScaleMultiplier,
                 Time.unscaledDeltaTime * 10f
             );
 
+            // 2. 타이머 갱신
             if (_cooldownTimer > 0f)
             {
                 _cooldownTimer -= Time.unscaledDeltaTime;
             }
+            if (_fleeFlashTimer > 0f)
+            {
+                _fleeFlashTimer -= Time.unscaledDeltaTime;
+            }
 
-            if (!_runsAway || _boundaryArea == null) return;
+            // 3. 발광(Glow) 틴트
+            if (_graphic != null)
+            {
+                if (_isHovered)
+                {
+                    float pulse = Mathf.Sin(Time.unscaledTime * 8f) * 0.5f + 0.5f;
+                    _graphic.color = Color.Lerp(_originalColor, _glowColor, pulse);
+                }
+                else if (_fleeFlashTimer > 0f)
+                {
+                    float flashProgress = _fleeFlashTimer / 0.35f;
+                    _graphic.color = Color.Lerp(_originalColor, _glowColor, flashProgress);
+                }
+                else
+                {
+                    _graphic.color = Vector4.MoveTowards(_graphic.color, _originalColor, Time.unscaledDeltaTime * 4f);
+                }
+            }
+
+            // 4. 마우스 거리 판별 및 회피/사운드 제어
+            if (_boundaryArea == null) return;
 
             Vector2 mouseScreenPos = Input.mousePosition;
             RectTransformUtility.ScreenPointToLocalPointInRectangle(
@@ -454,16 +549,32 @@ namespace _Project.Scripts.VisualScripting
             );
 
             float distToMouse = Vector2.Distance(_rect.anchoredPosition, mouseLocalPos);
-            if (_cooldownTimer <= 0f && distToMouse < _detectionRadius * _targetScaleRatio)
-            {
-                FleeToFurthestPoint();
-            }
+            float currentDetectionRadius = _detectionRadius * _targetScaleRatio;
 
-            _rect.anchoredPosition = Vector2.Lerp(
-                _rect.anchoredPosition,
-                _targetAnchoredPos,
-                Time.unscaledDeltaTime * _speed
-            );
+            if (_runsAway)
+            {
+                // 감지 반경 진입 시
+                if (distToMouse < currentDetectionRadius)
+                {
+                    PlayHoverSoundOnce();
+
+                    if (_cooldownTimer <= 0f)
+                    {
+                        FleeToFurthestPoint();
+                    }
+                }
+                // 마우스가 버튼 및 감지 반경 밖으로 완전히 벗어났을 때만 다음 호버를 위해 플래그 리셋
+                else if (!_isHovered && distToMouse > currentDetectionRadius + 15f)
+                {
+                    _hasPlayedHoverSound = false;
+                }
+
+                _rect.anchoredPosition = Vector2.Lerp(
+                    _rect.anchoredPosition,
+                    _targetAnchoredPos,
+                    Time.unscaledDeltaTime * _speed
+                );
+            }
         }
 
         private void FleeToFurthestPoint()
@@ -517,7 +628,24 @@ namespace _Project.Scripts.VisualScripting
 
             _targetAnchoredPos = bestCandidate;
             _cooldownTimer = _fleeCooldown;
-            _onEscapeSound?.Invoke();
+            _fleeFlashTimer = 0.35f;
+            // 회피 도중 지속 재생을 유발하던 호출 코드 제거
+        }
+
+        private void RestoreColor()
+        {
+            if (_graphic != null)
+            {
+                _graphic.color = _originalColor;
+            }
+        }
+
+        private void OnDisable()
+        {
+            _isHovered = false;
+            _hasPlayedHoverSound = false;
+            _fleeFlashTimer = 0f;
+            RestoreColor();
         }
     }
 }

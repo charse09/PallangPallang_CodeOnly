@@ -67,25 +67,26 @@ namespace _Project.Scripts.VisualScripting
         private void StartPlayAudio()
         {
             float? fadeOverride = overrideFadeDuration ? customFadeDuration : (float?)null;
+            float actualFadeDuration = 0f;
 
             switch (channelType)
             {
                 case BGMChannelType.MainBGM:
-                    SoundManager.Instance.PlayBGM(bgmKey, useFadeIn, fadeOverride, restartIfPlaying);
+                    actualFadeDuration = SoundManager.Instance.PlayBGM(bgmKey, useFadeIn, fadeOverride, restartIfPlaying);
                     break;
                 case BGMChannelType.SubBGM:
-                    SoundManager.Instance.PlaySubBGM(bgmKey, useFadeIn, fadeOverride, restartIfPlaying);
+                    actualFadeDuration = SoundManager.Instance.PlaySubBGM(bgmKey, useFadeIn, fadeOverride, restartIfPlaying);
                     break;
                 case BGMChannelType.Ambience:
-                    SoundManager.Instance.PlayAmbience(bgmKey, useFadeIn, fadeOverride, restartIfPlaying);
+                    actualFadeDuration = SoundManager.Instance.PlayAmbience(bgmKey, useFadeIn, fadeOverride, restartIfPlaying);
                     break;
             }
 
-            if (waitForFade && useFadeIn)
+            // 페이드 대기 옵션이 켜져 있고, 실제로 페이드 인이 진행되는 경우에만 대기
+            if (waitForFade && actualFadeDuration > 0f)
             {
-                float waitTime = overrideFadeDuration ? customFadeDuration : 1.5f;
                 if (_fadeWaitCoroutine != null) StopCoroutine(_fadeWaitCoroutine);
-                _fadeWaitCoroutine = StartCoroutine(WaitForFadeRoutine(waitTime));
+                _fadeWaitCoroutine = StartCoroutine(WaitForFadeRoutine(actualFadeDuration));
             }
             else
             {
@@ -103,6 +104,18 @@ namespace _Project.Scripts.VisualScripting
         public override void Reset()
         {
             base.Reset();
+            ClearFadeCoroutine();
+            IsOn = false;
+        }
+
+        private void OnDisable()
+        {
+            ClearFadeCoroutine();
+            IsOn = false;
+        }
+
+        private void ClearFadeCoroutine()
+        {
             if (_fadeWaitCoroutine != null)
             {
                 StopCoroutine(_fadeWaitCoroutine);

@@ -26,12 +26,24 @@ namespace _Project.Scripts.VisualScripting.Output_UI
         [SerializeField] private CutInStringTable stringTable;
         [SerializeField] private QuestGuideData guideData = new QuestGuideData();
 
+        [Tooltip("체크 시 가이드가 열릴 때 효과음을 재생합니다.")]
+        [SerializeField] private bool playOpenSound = true;
+
+        [Tooltip("가이드 등장 시 재생할 SFX 키 (SO_SFXTable 등록 키)")]
+        [SerializeField] private string openSoundKey = "QuestGuide_Open";
+
         [Header("Hide Settings (Hide 선택 시 적용)")]
         [Tooltip("체크 시 가이드가 사라질 때 서서히 투명해지며 닫힙니다.")]
         [SerializeField] private bool useFadeOut = true;
 
         [Tooltip("서서히 사라지는 페이드아웃 시간(초)")]
         [SerializeField] private float fadeOutDuration = 0.5f;
+
+        [Tooltip("체크 시 가이드가 닫힐 때 효과음을 재생합니다.")]
+        [SerializeField] private bool playCloseSound = true;
+
+        [Tooltip("가이드 퇴장 시 재생할 SFX 키 (SO_SFXTable 등록 키)")]
+        [SerializeField] private string closeSoundKey = "QuestGuide_Close";
 
         [Header("Progression Settings")]
         [Tooltip("체크 시 등장/퇴장 페이드 연출 완료를 기다리지 않고 즉시 다음 노드로 진행합니다.")]
@@ -59,18 +71,38 @@ namespace _Project.Scripts.VisualScripting.Output_UI
 
             if (actionType == GuideActionType.Show)
             {
-                // 불필요한 Progression을 제외한 데이터를 매니저로 전달
+                // ?? 가이드 열림 효과음 재생
+                if (playOpenSound)
+                {
+                    PlaySFX(openSoundKey);
+                }
+
+                // 매니저로는 비주얼 연출만 전달
                 manager.ShowGuide(guideData.ToCutInStepData(), stringTable, OnCompleted);
             }
             else
             {
-                // 지정된 FadeOut 설정으로 가이드 닫기
+                // ?? 가이드 닫힘 효과음 재생
+                if (playCloseSound)
+                {
+                    PlaySFX(closeSoundKey);
+                }
+
+                // 매니저로 닫기 연출 전달
                 manager.HideGuide(useFadeOut, fadeOutDuration, OnCompleted);
             }
 
             if (runInBackground)
             {
                 IsOn = true;
+            }
+        }
+
+        private void PlaySFX(string soundKey)
+        {
+            if (!string.IsNullOrEmpty(soundKey) && SoundManager.Instance != null)
+            {
+                SoundManager.Instance.PlaySFX(soundKey);
             }
         }
 
@@ -114,10 +146,6 @@ namespace _Project.Scripts.VisualScripting.Output_UI
         public float shakeDuration = 0.5f;
         public float shakeIntensity = 20f;
 
-        [Header("Audio")]
-        [Tooltip("등장 시 출력할 효과음 오디오 에셋 ID")]
-        public string sfxID;
-
         [Header("Dialogue Text")]
         public string stringID;
         public Vector2 textOffset = Vector2.zero;
@@ -144,7 +172,7 @@ namespace _Project.Scripts.VisualScripting.Output_UI
                 useShake = this.useShake,
                 shakeDuration = this.shakeDuration,
                 shakeIntensity = this.shakeIntensity,
-                sfxID = this.sfxID,
+                sfxID = null, // 사운드는 QuestGuideOutput 노드에서 직접 제어
                 stringID = this.stringID,
                 textOffset = this.textOffset,
                 useTextEnterEffect = this.useTextEnterEffect,
@@ -152,7 +180,6 @@ namespace _Project.Scripts.VisualScripting.Output_UI
                 textEnterOffset = this.textEnterOffset,
                 textEnterDuration = this.textEnterDuration,
                 textEnterCurve = this.textEnterCurve,
-                // 프레임워크 유지형이므로 스텝 내부 대기 비활성화
                 progressionMode = ProgressionMode.WaitInput
             };
         }
