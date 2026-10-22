@@ -1,0 +1,1386 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e39dd24024e56ce4094de13a596cd9ef, type: 3}
+  m_Name: VoiceTable
+  m_EditorClassIdentifier: Assembly-CSharp::SO_VoiceTable
+  voiceFolder: {fileID: 102900000, guid: 539e65a987081a947ac848411024737c, type: 3}
+  includeSubfolders: 1
+  removeMissingClips: 1
+  voiceDataList:
+  - voiceKey: ChooseOne_BR_01-Echo
+    speaker: Berry
+    clip: {fileID: 8300000, guid: 77d21d148952fa94bb3c8c61665b7f61, type: 3}
+    volume: 1
+    is3D: 0
+    enableDucking: 1
+  - voiceKey: ChooseOne_BR_01-Original
+    speaker: 
+    clip: {fileID: 8300000, guid: a4d538f8b7d1af04490aefdacdc40b89, type: 3}
+    volume: 1
+    is3D: 0
+    enableDucking: 1
+  - voiceKey: ChooseOne_BR_02-Echo
+    speaker: Berry
+    clip: {fileID: 8300000, guid: 17dfe093e2591474db8a2d195f71564a, type: 3}
+    volume: 1
+    is3D: 0
+    enableDucking: 1
+  - voiceKey: ChooseOne_BR_02-Original
+    speaker: 
+    clip: {fileID: 8300000, guid: 187cddbfb80ce2f458d44daa12ac76af, type: 3}
+    volume: 1
+    is3D: 0
+    enableDucking: 1
+  - voiceKey: ChooseOne_BR_03-Echo
+    speaker: Berry
+    clip: {fileID: 8300000, guid: dcddfafe4d3addb47bb1d1cea2081d6f, type: 3}
+    volume: 1
+    is3D: 0
+    enableDucking: 1
+  - voiceKey: ChooseOne_BR_03-Original
+    speaker: 
+    clip: {fileID: 8300000, guid: cef5651b4a47d654c9a46b96420a0054, type: 3}
+    volume: 1
+    is3D: 0
+    enableDucking: 1
+  - voiceKey: ChooseOne_BR_04-Echo
+    speaker: Berry
+    clip: {fileID: 8300000, guid: 7fa542d716ecbf64d8c1a31d616fdc43, type: 3}
+    volume: 1
+    is3D: 0
+    enableDucking: 1
+  - voiceKey: ChooseOne_BR_04-Original
+    speaker: 
+    clip: {fileID: 8300000, guid: 92cd47b7e62b0b849bb36018291b735b, type: 3}
+    volume: 1
+    is3D: 0
+    enableDucking: 1
+  - voiceKey: ChooseOne_BR_05-Echo
+    speaker: Berry
+    clip: {fileID: 8300000, guid: 97f578bdabce4cb4eb0c4becd4ea7a49, type: 3}
+    volume: 1
+    is3D: 0
+    enableDucking: 1
+  - voiceKey: ChooseOne_BR_05-Original
+    speaker: 
+    clip: {fileID: 8300000, guid: f71bc3e79dc189b4796f4cd55757873b, type: 3}
+    volume: 1
+    is3D: 0
+    enableDucking: 1
+  - voiceKey: Tuto_BR_01
+    speaker: Berry
+    clip: {fileID: 8300000, guid: 86d8a7b586488d9439f25c1e9ac48ca4, type: 3}
+    volume: 1
+    is3D: 0
+    enableDucking: 1
+  - voiceKey: Tuto_BR_02
+    speaker: 
+    clip: {fileID: 8300000, guid: 9c0df968863d3b34d8638172679e3e10, type: 3}
+    volume: 1
+    is3D: 0
+    enableDucking: 1
+  - voiceKey: Tuto_BR_03
+    speaker: 
+    clip: {fileID: 8300000, guid: 3950e7ab8251f3046a5fc60ee9466b9c, type: 3}
+    volume: 1
+    is3D: 0
+    enableDucking: 1
+  - voiceKey: Tuto_BR_04
+    speaker: 
+    clip: {fileID: 8300000, guid: baaf4ad6b61e7244a89a06b515cfa3e2, type: 3}
+    volume: 1
+    is3D: 0
+    enableDucking: 1
+  - voiceKey: Tuto_BR_05
+    speaker: 
+    clip: {fileID: 8300000, guid: 72762188ae946364a8a892c20a9b1b78, type: 3}
+    volume: 1
+    is3D: 0
+    enableDucking: 1
+  - voiceKey: Tuto_BR_06
+    speaker: 
+    clip: {fileID: 8300000, guid: f045accc57bab1e47a0dd5acec61989a, type: 3}
+    volume: 1
+    is3D: 0
+    enableDucking: 1
+  - voiceKey: Tuto_BR_07
+    speaker: 
+    clip: {fileID: 8300000, guid: 78134877e629e3a4eb4d1ee03d036492, type: 3}
+    volume: 1
+    is3D: 0
+    enableDucking: 1
+  - voiceKey: Tuto_BR_08
+    speaker: 
+    clip: {fileID: 8300000, guid: 4acbf295a3b7d0f439e6f3287223c8f1, type: 3}
+    volume: 1
+    is3D: 0
+    enableDucking: 1
+  - voiceKey: Tuto_BR_09
+    speaker: 
+    clip: {fileID: 8300000, guid: d7007e7b23c6ca547a2e407d782de14f, type: 3}
+    volume: 1
+    is3D: 0
+    enableDucking: 1
+  - voiceKey: Tuto_BR_10
+    speaker: 
+    clip: {fileID: 8300000, guid: d904f286f0655c842b9b134144dacb62, type: 3}
+    volume: 1
+    is3D: 0
+    enableDucking: 1
+  - voiceKey: Tuto_BR_11
+    speaker: 
+    clip: {fileID: 8300000, guid: 02832e16ce75ab54cba2957fa9510760, type: 3}
+    volume: 1
+    is3D: 0
+    enableDucking: 1
+  - voiceKey: Tuto_BR_12
+    speaker: 
+    clip: {fileID: 8300000, guid: cb676491f6a7f2a40a51173112cd80bd, type: 3}
+    volume: 1
+    is3D: 0
+    enableDucking: 1
+  - voiceKey: Tuto_BR_13
+    speaker: 
+    clip: {fileID: 8300000, guid: d1e553c97c33e9a4b80055d477c8becf, type: 3}
+    volume: 1
+    is3D: 0
+    enableDucking: 1
+  - voiceKey: HH1_BR_01
+    speaker: 
+    clip: {fileID: 8300000, guid: cd028c0f219e5534e9b1afd360ddd2df, type: 3}
+    volume: 1
+    is3D: 0
+    enableDucking: 1
+  - voiceKey: HH1_BR_02
+    speaker: 
+    clip: {fileID: 8300000, guid: 4a2551e203a1a7540a7ded0119768cfe, type: 3}
+    volume: 1
+    is3D: 0
+    enableDucking: 1
+  - voiceKey: HH1_BR_03
+    speaker: 
+    clip: {fileID: 8300000, guid: 34bc9658ec6eb9d43aef1ff91fdcc446, type: 3}
+    volume: 1
+    is3D: 0
+    enableDucking: 1
+  - voiceKey: HH1_BR_04
+    speaker: 
+    clip: {fileID: 8300000, guid: 07a0500a646431b449d0519cb3d526f3, type: 3}
+    volume: 1
+    is3D: 0
+    enableDucking: 1
+  - voiceKey: HH1_BR_05
+    speaker: 
+    clip: {fileID: 8300000, guid: 091a4582188176b418ff7f9a35b3374b, type: 3}
+    volume: 1
+    is3D: 0
+    enableDucking: 1
+  - voiceKey: HH1_BR_06
+    speaker: 
+    clip: {fileID: 8300000, guid: 4a55e588b59d0d44cb64c03c02062011, type: 3}
+    volume: 1
+    is3D: 0
+    enableDucking: 1
+  - voiceKey: HH1_BR_07
+    speaker: 
+    clip: {fileID: 8300000, guid: 78bf60dcad8ea8a46b98c077dd1e5d1a, type: 3}
+    volume: 1
+    is3D: 0
+    enableDucking: 1
+  - voiceKey: HH1_BR_08
+    speaker: 
+    clip: {fileID: 8300000, guid: 2abdbf9e0bff23d4eb36dbcdca31b002, type: 3}
+    volume: 1
+    is3D: 0
+    enableDucking: 1
+  - voiceKey: HH2_BR_01
+    speaker: 
+    clip: {fileID: 8300000, guid: 53266aac36f3a61408953b75c6249023, type: 3}
+    volume: 1
+    is3D: 0
+    enableDucking: 1
+  - voiceKey: HH2_BR_02
+    speaker: 
+    clip: {fileID: 8300000, guid: 917a638365d026b4ba42ba584b874bf2, type: 3}
+    volume: 1
+    is3D: 0
+    enableDucking: 1
+  - voiceKey: HH2_BR_03
+    speaker: 
+    clip: {fileID: 8300000, guid: 2afce5a9225c0374c9028fb0e4a7dde2, type: 3}
+    volume: 1
+    is3D: 0
+    enableDucking: 1
+  - voiceKey: HH2_BR_04
+    speaker: 
+    clip: {fileID: 8300000, guid: e56cf4669dfc8f945af7173ce88a82b0, type: 3}
+    volume: 1
+    is3D: 0
+    enableDucking: 1
+  - voiceKey: HH2_BR_05
+    speaker: 
+    clip: {fileID: 8300000, guid: 25ff345abcd9d0c4eba3b27a48b7d274, type: 3}
+    volume: 1
+    is3D: 0
+    enableDucking: 1
+  - voiceKey: HH2_BR_06
+    speaker: 
+    clip: {fileID: 8300000, guid: b5d93dd309999214e8c45d4f0d652676, type: 3}
+    volume: 1
+    is3D: 0
+    enableDucking: 1
+  - voiceKey: HH2_BR_07
+    speaker: 
+    clip: {fileID: 8300000, guid: 800698a6174cf3344802d8fa57375c25, type: 3}
+    volume: 1
+    is3D: 0
+    enableDucking: 1
+  - voiceKey: Tuto_BR_12.5
+    speaker: 
+    clip: {fileID: 8300000, guid: a7de2c7879783884c8d6a9917977e42d, type: 3}
+    volume: 1
+    is3D: 0
+    enableDucking: 1
+  - voiceKey: BR_01
+    speaker: 
+    clip: {fileID: 8300000, guid: 55f1ecfcd167269449e7c998e9c11dcb, type: 3}
+    volume: 1
+    is3D: 0
+    enableDucking: 1
+  - voiceKey: BR_02
+    speaker: 
+    clip: {fileID: 8300000, guid: e04556e26055cb14e9e3299bd82518bc, type: 3}
+    volume: 1
+    is3D: 0
+    enableDucking: 1
+  - voiceKey: BR_03
+    speaker: 
+    clip: {fileID: 8300000, guid: 53a6745f5f4916f44be438b3ce00c9be, type: 3}
+    volume: 1
+    is3D: 0
+    enableDucking: 1
+  - voiceKey: BR_04
+    speaker: 
+    clip: {fileID: 8300000, guid: c4a7b82d1810fb543b84196297f92a75, type: 3}
+    volume: 1
+    is3D: 0
+    enableDucking: 1
+  - voiceKey: BR_05
+    speaker: 
+    clip: {fileID: 8300000, guid: 0526830158e59094889839567881262f, type: 3}
+    volume: 1
+    is3D: 0
+    enableDucking: 1
+  - voiceKey: BR_06
+    speaker: 
+    clip: {fileID: 8300000, guid: aaa9df3f8b695e343991f7f8612671df, type: 3}
+    volume: 1
+    is3D: 0
+    enableDucking: 1
+  - voiceKey: BR_07
+    speaker: 
+    clip: {fileID: 8300000, guid: aca9d754e587a2748a91c1e557445512, type: 3}
+    volume: 1
+    is3D: 0
+    enableDucking: 1
+  - voiceKey: BR_08
+    speaker: 
+    clip: {fileID: 8300000, guid: 25af93129c101694db8b5a41a6079a5d, type: 3}
+    volume: 1
+    is3D: 0
+    enableDucking: 1
+  - voiceKey: BR_09
+    speaker: 
+    clip: {fileID: 8300000, guid: 49015bcc486fdfb43ac53117efe367eb, type: 3}
+    volume: 1
+    is3D: 0
+    enableDucking: 1
+  - voiceKey: BR_10
+    speaker: 
+    clip: {fileID: 8300000, guid: 1bc5c59ec0d26884d96c6ff38e50a292, type: 3}
+    volume: 1
+    is3D: 0
+    enableDucking: 1
+  - voiceKey: BR_11
+    speaker: 
+    clip: {fileID: 8300000, guid: 6ec90806bec2b484f98ea51deef28f81, type: 3}
+    volume: 1
+    is3D: 0
+    enableDucking: 1
+  - voiceKey: BR_12
+    speaker: 
+    clip: {fileID: 8300000, guid: d39c8e4c4dea2c84b9c252522a0d5eac, type: 3}
+    volume: 1
+    is3D: 0
+    enableDucking: 1
+  - voiceKey: BR_13
+    speaker: 
+    clip: {fileID: 8300000, guid: 5b8df0314ab036142b866068c44a06a3, type: 3}
+    volume: 1
+    is3D: 0
+    enableDucking: 1
+  - voiceKey: BR_14
+    speaker: 
+    clip: {fileID: 8300000, guid: 2773eb3ef440d2844a03b5d6cbc7c3be, type: 3}
+    volume: 1
+    is3D: 0
+    enableDucking: 1
+  - voiceKey: BR_15
+    speaker: 
+    clip: {fileID: 8300000, guid: f309f8f79f6215d44a99802631b3cf04, type: 3}
+    volume: 1
+    is3D: 0
+    enableDucking: 1
+  - voiceKey: BR_16
+    speaker: 
+    clip: {fileID: 8300000, guid: 1fb1dcb3ca56cbc44ad48eef3cf1cabd, type: 3}
+    volume: 1
+    is3D: 0
+    enableDucking: 1
+  - voiceKey: BR_17
+    speaker: 
+    clip: {fileID: 8300000, guid: ef92ee4d830774543aaaf2477fcb603a, type: 3}
+    volume: 1
+    is3D: 0
+    enableDucking: 1
+  - voiceKey: BR_18
+    speaker: 
+    clip: {fileID: 8300000, guid: 76090ed0494298f41b111cc74b72c0db, type: 3}
+    volume: 1
+    is3D: 0
+    enableDucking: 1
+  - voiceKey: BR_19
+    speaker: 
+    clip: {fileID: 8300000, guid: e486dbdd02433c7409f98f3626ad2aa5, type: 3}
+    volume: 1
+    is3D: 0
+    enableDucking: 1
+  - voiceKey: BR_20
+    speaker: 
+    clip: {fileID: 8300000, guid: 74312a0e2ec8cc140a277b09d6eca66a, type: 3}
+    volume: 1
+    is3D: 0
+    enableDucking: 1
+  - voiceKey: BR_21
+    speaker: 
+    clip: {fileID: 8300000, guid: 687622a734d394e47ba1000d5388527a, type: 3}
+    volume: 1
+    is3D: 0
+    enableDucking: 1
+  - voiceKey: BR_22
+    speaker: 
+    clip: {fileID: 8300000, guid: 248474095bc979b4c9195e55ad1ecf6e, type: 3}
+    volume: 1
+    is3D: 0
+    enableDucking: 1
+  - voiceKey: BR_23
+    speaker: 
+    clip: {fileID: 8300000, guid: 6043e1525f04f0b4abf2e55724be4264, type: 3}
+    volume: 1
+    is3D: 0
+    enableDucking: 1
+  - voiceKey: BR_24
+    speaker: 
+    clip: {fileID: 8300000, guid: ec273b2fd942f6249857e7c5ab4ed081, type: 3}
+    volume: 1
+    is3D: 0
+    enableDucking: 1
+  - voiceKey: HH1_SB_01
+    speaker: 
+    clip: {fileID: 8300000, guid: cb83f2b2cf5d5ef4392749cb8e2db41f, type: 3}
+    volume: 1
+    is3D: 0
+    enableDucking: 1
+  - voiceKey: HH1_SB_02
+    speaker: 
+    clip: {fileID: 8300000, guid: b803b4f6ac2ece24b846005dce1872f7, type: 3}
+    volume: 1
+    is3D: 0
+    enableDucking: 1
+  - voiceKey: Print_SB_01
+    speaker: 
+    clip: {fileID: 8300000, guid: 53d44ab4981b9444382fc6158fc52600, type: 3}
+    volume: 1
+    is3D: 0
+    enableDucking: 1
+  - voiceKey: Tuto2_SB_01
+    speaker: 
+    clip: {fileID: 8300000, guid: 8b51b8368df9d4240abce9eee41b4f74, type: 3}
+    volume: 1
+    is3D: 0
+    enableDucking: 1
+  - voiceKey: Tuto2_SB_A_01
+    speaker: 
+    clip: {fileID: 8300000, guid: 9d6b8b96f6f3efb47b34338361039e0d, type: 3}
+    volume: 1
+    is3D: 0
+    enableDucking: 1
+  - voiceKey: Tuto2_SB_A_02
+    speaker: 
+    clip: {fileID: 8300000, guid: 7dce25ad953aebd4092c810ae346bb04, type: 3}
+    volume: 1
+    is3D: 0
+    enableDucking: 1
+  - voiceKey: Tuto2_SB_A_03
+    speaker: 
+    clip: {fileID: 8300000, guid: 62316325f52ced14da26e63866d3b977, type: 3}
+    volume: 1
+    is3D: 0
+    enableDucking: 1
+  - voiceKey: Tuto2_SB_B_01
+    speaker: 
+    clip: {fileID: 8300000, guid: 050396144f5764641a10a29a8cf3cf25, type: 3}
+    volume: 1
+    is3D: 0
+    enableDucking: 1
+  - voiceKey: Tuto2_SB_B_02
+    speaker: 
+    clip: {fileID: 8300000, guid: 6beea54e51bf87f41b293ec9b752cbe1, type: 3}
+    volume: 1
+    is3D: 0
+    enableDucking: 1
+  - voiceKey: Tuto2_SB_B_03
+    speaker: 
+    clip: {fileID: 8300000, guid: 910d8797c8fa1614080b3d54977ec34f, type: 3}
+    volume: 1
+    is3D: 0
+    enableDucking: 1
+  - voiceKey: Tuto2_SB_C_01
+    speaker: 
+    clip: {fileID: 8300000, guid: 65d47e3a182225d4c9148b5a85b87f93, type: 3}
+    volume: 1
+    is3D: 0
+    enableDucking: 1
+  - voiceKey: Tuto2_SB_C_02
+    speaker: 
+    clip: {fileID: 8300000, guid: 48c0124e24f4d7f47821ce1fe20b6cc7, type: 3}
+    volume: 1
+    is3D: 0
+    enableDucking: 1
+  - voiceKey: Tuto2_SB_C_03
+    speaker: 
+    clip: {fileID: 8300000, guid: ed715811cef2a5b4a9955358d9dbf423, type: 3}
+    volume: 1
+    is3D: 0
+    enableDucking: 1
+  - voiceKey: Tuto2_SB_D_01
+    speaker: 
+    clip: {fileID: 8300000, guid: 3713a8daf0b45b64986c0db3e3462609, type: 3}
+    volume: 1
+    is3D: 0
+    enableDucking: 1
+  - voiceKey: Tuto2_SB_D_02
+    speaker: 
+    clip: {fileID: 8300000, guid: a68f5140e6a546343a16f95c8e07da1a, type: 3}
+    volume: 1
+    is3D: 0
+    enableDucking: 1
+  - voiceKey: Tuto2_SB_D_03
+    speaker: 
+    clip: {fileID: 8300000, guid: c4c7ace029800d047b8e2b18c5e15383, type: 3}
+    volume: 1
+    is3D: 0
+    enableDucking: 1
+  - voiceKey: Print_Sha_01
+    speaker: 
+    clip: {fileID: 8300000, guid: 2b5f8b8ce1415724aaf70220a8aecbe8, type: 3}
+    volume: 1
+    is3D: 0
+    enableDucking: 1
+  - voiceKey: Prologue_Sha_All
+    speaker: 
+    clip: {fileID: 8300000, guid: f8bdf62bcfe8dec49b67a0b56390bf3f, type: 3}
+    volume: 1
+    is3D: 0
+    enableDucking: 1
+  - voiceKey: Tuto2_Sha_01
+    speaker: 
+    clip: {fileID: 8300000, guid: a71ab851f9cb4814bbd38da8a2085505, type: 3}
+    volume: 1
+    is3D: 0
+    enableDucking: 1
+  - voiceKey: Tuto2_Sha_02
+    speaker: 
+    clip: {fileID: 8300000, guid: 7cb00ad1b8e6e6d4dbf0a568343eba93, type: 3}
+    volume: 1
+    is3D: 0
+    enableDucking: 1
+  - voiceKey: Tuto2_Sha_03
+    speaker: 
+    clip: {fileID: 8300000, guid: d767a75484a47824b8cbf68e662f9dc3, type: 3}
+    volume: 1
+    is3D: 0
+    enableDucking: 1
+  - voiceKey: HH1_Sha_01
+    speaker: 
+    clip: {fileID: 8300000, guid: c213dfee4384a9849ab9e236ad3c3dd6, type: 3}
+    volume: 1
+    is3D: 0
+    enableDucking: 1
+  - voiceKey: HH1_Sha_02
+    speaker: 
+    clip: {fileID: 8300000, guid: e75d51cdca73e1a42ad7958f5d24b57f, type: 3}
+    volume: 1
+    is3D: 0
+    enableDucking: 1
+  - voiceKey: HH1_Sha_03
+    speaker: 
+    clip: {fileID: 8300000, guid: 747364af233379746942bc59ca0b5b96, type: 3}
+    volume: 1
+    is3D: 0
+    enableDucking: 1
+  - voiceKey: HH1_Sha_04
+    speaker: 
+    clip: {fileID: 8300000, guid: 89d1276a9edcaba459bcda65082c096a, type: 3}
+    volume: 1
+    is3D: 0
+    enableDucking: 1
+  - voiceKey: HH1_Sha_05
+    speaker: 
+    clip: {fileID: 8300000, guid: 1ecc76ef0d7cdc44493b135c455b99e7, type: 3}
+    volume: 1
+    is3D: 0
+    enableDucking: 1
+  - voiceKey: HH1_Sha_06
+    speaker: 
+    clip: {fileID: 8300000, guid: 9ae0833fa0dfbb54f9867559bdb375bd, type: 3}
+    volume: 1
+    is3D: 0
+    enableDucking: 1
+  - voiceKey: HH2_Sha_01
+    speaker: 
+    clip: {fileID: 8300000, guid: 3a3d871db6a61f54ab1adef2358ee31d, type: 3}
+    volume: 1
+    is3D: 0
+    enableDucking: 1
+  - voiceKey: HH2_Sha_02
+    speaker: 
+    clip: {fileID: 8300000, guid: 6bbb1b3a5dac8904ab5e39a76cb36c89, type: 3}
+    volume: 1
+    is3D: 0
+    enableDucking: 1
+  - voiceKey: ChooseOne_YB_01
+    speaker: YenBeol
+    clip: {fileID: 8300000, guid: bc957c28183138a4dbfc767232db6bab, type: 3}
+    volume: 1
+    is3D: 1
+    enableDucking: 1
+  - voiceKey: ChooseOne_YB_02
+    speaker: YenBeol
+    clip: {fileID: 8300000, guid: 3b273cf4b336b3e46bfe498845a95da6, type: 3}
+    volume: 1
+    is3D: 1
+    enableDucking: 1
+  - voiceKey: Print_YB_01
+    speaker: 
+    clip: {fileID: 8300000, guid: ee027baec606f584f8ee0bd88c33c3c0, type: 3}
+    volume: 1
+    is3D: 0
+    enableDucking: 1
+  - voiceKey: Print_YB_02
+    speaker: 
+    clip: {fileID: 8300000, guid: 7d331f3632e2c3841aa5ace50e818f4c, type: 3}
+    volume: 1
+    is3D: 0
+    enableDucking: 1
+  - voiceKey: Print_YB_03
+    speaker: 
+    clip: {fileID: 8300000, guid: 58dd6c648acdc844b857302565ac8328, type: 3}
+    volume: 1
+    is3D: 0
+    enableDucking: 1
+  - voiceKey: Prologue_YB
+    speaker: 
+    clip: {fileID: 8300000, guid: 2a9d21942c4464d4bb42ac5a9da24292, type: 3}
+    volume: 1
+    is3D: 0
+    enableDucking: 1
+  - voiceKey: Tuto1_YB_01
+    speaker: YenBeol
+    clip: {fileID: 8300000, guid: ba44447cbcac9b34ca38b2ac04149779, type: 3}
+    volume: 1
+    is3D: 0
+    enableDucking: 1
+  - voiceKey: Tuto1_YB_02
+    speaker: YenBeol
+    clip: {fileID: 8300000, guid: f8f49a7935f2df54aaf2b7946a7fe946, type: 3}
+    volume: 1
+    is3D: 0
+    enableDucking: 1
+  - voiceKey: Tuto1_YB_03-1
+    speaker: 
+    clip: {fileID: 8300000, guid: 3c96da1183212c442b2c32bebee8e545, type: 3}
+    volume: 1
+    is3D: 0
+    enableDucking: 1
+  - voiceKey: Tuto1_YB_03-2
+    speaker: 
+    clip: {fileID: 8300000, guid: 809105aaf29e8d74689eac9dcfe6edb4, type: 3}
+    volume: 1
+    is3D: 0
+    enableDucking: 1
+  - voiceKey: Tuto1_YB_04
+    speaker: 
+    clip: {fileID: 8300000, guid: bec56eb68d6ace74f9261e253d253626, type: 3}
+    volume: 1
+    is3D: 0
+    enableDucking: 1
+  - voiceKey: Tuto1_YB_05
+    speaker: 
+    clip: {fileID: 8300000, guid: 8af9c129168b3d74ea293bebaf1e04b2, type: 3}
+    volume: 1
+    is3D: 0
+    enableDucking: 1
+  - voiceKey: Tuto1_YB_06
+    speaker: 
+    clip: {fileID: 8300000, guid: 25ca422bb4f00d749a767d692d5d2a24, type: 3}
+    volume: 1
+    is3D: 0
+    enableDucking: 1
+  - voiceKey: Tuto1_YB_07
+    speaker: 
+    clip: {fileID: 8300000, guid: 2602eb5c4cb4e4942b1d32f703d4cec1, type: 3}
+    volume: 1
+    is3D: 0
+    enableDucking: 1
+  - voiceKey: Tuto1_YB_08
+    speaker: 
+    clip: {fileID: 8300000, guid: 01e013c2b1ff1824daca11177aa25351, type: 3}
+    volume: 1
+    is3D: 0
+    enableDucking: 1
+  - voiceKey: Tuto1_YB_09
+    speaker: 
+    clip: {fileID: 8300000, guid: 69d780e9ef7d7a5459701baea25d7f28, type: 3}
+    volume: 1
+    is3D: 0
+    enableDucking: 1
+  - voiceKey: Tuto1_YB_10
+    speaker: 
+    clip: {fileID: 8300000, guid: 933883e6da0bc4840a0a6938f8ffb273, type: 3}
+    volume: 1
+    is3D: 0
+    enableDucking: 1
+  - voiceKey: Tuto1_YB_11
+    speaker: 
+    clip: {fileID: 8300000, guid: 0782361ede36b074f9e96b3f49d4ff51, type: 3}
+    volume: 1
+    is3D: 0
+    enableDucking: 1
+  - voiceKey: Tuto1_YB_12
+    speaker: 
+    clip: {fileID: 8300000, guid: 413f2171d551ab948a51e609e8060ffc, type: 3}
+    volume: 1
+    is3D: 0
+    enableDucking: 1
+  - voiceKey: Tuto1_YB_13
+    speaker: 
+    clip: {fileID: 8300000, guid: 9d38a840e8784ed49942c5548468f9ef, type: 3}
+    volume: 1
+    is3D: 0
+    enableDucking: 1
+  - voiceKey: Tuto1_YB_14
+    speaker: 
+    clip: {fileID: 8300000, guid: 37433abc65a6b964a8d8ad187d43bfa3, type: 3}
+    volume: 1
+    is3D: 0
+    enableDucking: 1
+  - voiceKey: Tuto1_YB_15
+    speaker: 
+    clip: {fileID: 8300000, guid: 1ecf197fc34ab5146b52ba8ab6fccfc5, type: 3}
+    volume: 1
+    is3D: 0
+    enableDucking: 1
+  - voiceKey: Tuto1_YB_16
+    speaker: 
+    clip: {fileID: 8300000, guid: b4a6564b1a252f74a846ce1cf00d1c7e, type: 3}
+    volume: 1
+    is3D: 0
+    enableDucking: 1
+  - voiceKey: Tuto1_YB_17
+    speaker: 
+    clip: {fileID: 8300000, guid: 6497c75d0ca3f67468cfdd89442bb339, type: 3}
+    volume: 1
+    is3D: 0
+    enableDucking: 1
+  - voiceKey: Tuto1_YB_18
+    speaker: 
+    clip: {fileID: 8300000, guid: a649d4cde7deffa429a8c7709eb6345a, type: 3}
+    volume: 1
+    is3D: 0
+    enableDucking: 1
+  - voiceKey: Tuto1_YB_19
+    speaker: 
+    clip: {fileID: 8300000, guid: 6f4f24756e4360345bcaed736e9fce7b, type: 3}
+    volume: 1
+    is3D: 0
+    enableDucking: 1
+  - voiceKey: Tuto1_YB_20
+    speaker: 
+    clip: {fileID: 8300000, guid: 2fafb0fcd14cd43459dd5431dddf074e, type: 3}
+    volume: 1
+    is3D: 0
+    enableDucking: 1
+  - voiceKey: Tuto1_YB_21
+    speaker: 
+    clip: {fileID: 8300000, guid: 6143dd57a59f7464fa8d197a2c303094, type: 3}
+    volume: 1
+    is3D: 0
+    enableDucking: 1
+  - voiceKey: Tuto1_YB_22
+    speaker: 
+    clip: {fileID: 8300000, guid: be7bcd5f6b2e4de4c806f59089a6a006, type: 3}
+    volume: 1
+    is3D: 0
+    enableDucking: 1
+  - voiceKey: Tuto1_YB_23
+    speaker: 
+    clip: {fileID: 8300000, guid: 659d7391c718b28468d1777f9fb317da, type: 3}
+    volume: 1
+    is3D: 0
+    enableDucking: 1
+  - voiceKey: Tuto1_YB_24
+    speaker: 
+    clip: {fileID: 8300000, guid: 1b4ad6e95522b2e48b0d4eedb1163732, type: 3}
+    volume: 1
+    is3D: 0
+    enableDucking: 1
+  - voiceKey: Tuto1_YB_25
+    speaker: 
+    clip: {fileID: 8300000, guid: 487798423a6a71a4fa84cbc884e869a3, type: 3}
+    volume: 1
+    is3D: 0
+    enableDucking: 1
+  - voiceKey: Tuto1_YB_26
+    speaker: 
+    clip: {fileID: 8300000, guid: 0c33d1ed78afee748b17156344906ad6, type: 3}
+    volume: 1
+    is3D: 0
+    enableDucking: 1
+  - voiceKey: Tuto1_YB_27
+    speaker: 
+    clip: {fileID: 8300000, guid: 47157d31fee71d14990492bc46790a85, type: 3}
+    volume: 1
+    is3D: 0
+    enableDucking: 1
+  - voiceKey: Tuto1_YB_28-1
+    speaker: 
+    clip: {fileID: 8300000, guid: 0fbc04a517f02d84c9111b4fae45393f, type: 3}
+    volume: 1
+    is3D: 0
+    enableDucking: 1
+  - voiceKey: Tuto1_YB_28-2
+    speaker: 
+    clip: {fileID: 8300000, guid: b556bb628470dd14483f4265164aa367, type: 3}
+    volume: 1
+    is3D: 0
+    enableDucking: 1
+  - voiceKey: Tuto1_YB_29
+    speaker: 
+    clip: {fileID: 8300000, guid: 4c1c797274abcad469f9038734cd6785, type: 3}
+    volume: 1
+    is3D: 0
+    enableDucking: 1
+  - voiceKey: Tuto1_YB_30
+    speaker: 
+    clip: {fileID: 8300000, guid: b3d08e4886941124288170b317271734, type: 3}
+    volume: 1
+    is3D: 0
+    enableDucking: 1
+  - voiceKey: Tuto1_YB_31
+    speaker: 
+    clip: {fileID: 8300000, guid: 1c1ee7483c0fec645a0eace0e3ec462d, type: 3}
+    volume: 1
+    is3D: 0
+    enableDucking: 1
+  - voiceKey: Tuto1_YB_32
+    speaker: 
+    clip: {fileID: 8300000, guid: a5ccfd84596e7764caf36b068f69d7f2, type: 3}
+    volume: 1
+    is3D: 0
+    enableDucking: 1
+  - voiceKey: Tuto1_YB_33
+    speaker: 
+    clip: {fileID: 8300000, guid: b031c4cd53ac8c34e8c0f925d71a75fb, type: 3}
+    volume: 1
+    is3D: 0
+    enableDucking: 1
+  - voiceKey: Tuto2_YB_01
+    speaker: 
+    clip: {fileID: 8300000, guid: 0636a1a49e63633419c514133cf9c6da, type: 3}
+    volume: 1
+    is3D: 0
+    enableDucking: 1
+  - voiceKey: Tuto2_YB_02
+    speaker: 
+    clip: {fileID: 8300000, guid: f32e4d740894f7d45832d19800346421, type: 3}
+    volume: 1
+    is3D: 0
+    enableDucking: 1
+  - voiceKey: Tuto2_YB_03
+    speaker: 
+    clip: {fileID: 8300000, guid: 5bdee50413da0b84fbc44e584a61711f, type: 3}
+    volume: 1
+    is3D: 0
+    enableDucking: 1
+  - voiceKey: Tuto2_YB_04
+    speaker: 
+    clip: {fileID: 8300000, guid: eb123d976c21b2140a202cc14dfc83c8, type: 3}
+    volume: 1
+    is3D: 0
+    enableDucking: 1
+  - voiceKey: Tuto2_YB_05
+    speaker: 
+    clip: {fileID: 8300000, guid: 3e08e24e701a2d046ba7f07ec03ffb1f, type: 3}
+    volume: 1
+    is3D: 0
+    enableDucking: 1
+  - voiceKey: Tuto2_YB_06
+    speaker: 
+    clip: {fileID: 8300000, guid: 0c16505d9479ea74586d1690e7d1a9b7, type: 3}
+    volume: 1
+    is3D: 0
+    enableDucking: 1
+  - voiceKey: Tuto2_YB_07
+    speaker: 
+    clip: {fileID: 8300000, guid: 8380457ba3bffdb4583b84436f754e1f, type: 3}
+    volume: 1
+    is3D: 0
+    enableDucking: 1
+  - voiceKey: Tuto2_YB_08
+    speaker: 
+    clip: {fileID: 8300000, guid: 480d981cfac9c59439746379680deb63, type: 3}
+    volume: 1
+    is3D: 0
+    enableDucking: 1
+  - voiceKey: Tuto2_YB_09
+    speaker: 
+    clip: {fileID: 8300000, guid: 607f9e564a937b744a90b899dd02b489, type: 3}
+    volume: 1
+    is3D: 0
+    enableDucking: 1
+  - voiceKey: Tuto2_YB_10
+    speaker: 
+    clip: {fileID: 8300000, guid: 63d3a085b5c6af649ac9e878a3c5f424, type: 3}
+    volume: 1
+    is3D: 0
+    enableDucking: 1
+  - voiceKey: Tuto2_YB_11
+    speaker: 
+    clip: {fileID: 8300000, guid: edb9df8138c3a6f47af329c94c6e3699, type: 3}
+    volume: 1
+    is3D: 0
+    enableDucking: 1
+  - voiceKey: Tuto2_YB_12
+    speaker: 
+    clip: {fileID: 8300000, guid: b52258afbf0af744e9eb03f7cd575a00, type: 3}
+    volume: 1
+    is3D: 0
+    enableDucking: 1
+  - voiceKey: Tuto2_YB_13
+    speaker: 
+    clip: {fileID: 8300000, guid: 9a6201c3cce38f247aad24b069f980e9, type: 3}
+    volume: 1
+    is3D: 0
+    enableDucking: 1
+  - voiceKey: Tuto2_YB_14
+    speaker: 
+    clip: {fileID: 8300000, guid: 2f6124592be6cd04bbdbb481b610d443, type: 3}
+    volume: 1
+    is3D: 0
+    enableDucking: 1
+  - voiceKey: Tuto2_YB_15
+    speaker: 
+    clip: {fileID: 8300000, guid: 8c5c47fe0e2f3124ba58ef52de6ac46f, type: 3}
+    volume: 1
+    is3D: 0
+    enableDucking: 1
+  - voiceKey: Tuto2_YB_16
+    speaker: 
+    clip: {fileID: 8300000, guid: 5ff8223504e976f4fa24a98f0694a020, type: 3}
+    volume: 1
+    is3D: 0
+    enableDucking: 1
+  - voiceKey: Tuto2_YB_17
+    speaker: 
+    clip: {fileID: 8300000, guid: 70876a14a5a4e5b43b54a74e3c4621b5, type: 3}
+    volume: 1
+    is3D: 0
+    enableDucking: 1
+  - voiceKey: Tuto2_YB_18
+    speaker: 
+    clip: {fileID: 8300000, guid: 039f15ae50dc30e4e95349adb0be07a8, type: 3}
+    volume: 1
+    is3D: 0
+    enableDucking: 1
+  - voiceKey: Tuto2_YB_19
+    speaker: 
+    clip: {fileID: 8300000, guid: b1db4f0dd9ca8af49bf4cc47025c68a8, type: 3}
+    volume: 1
+    is3D: 0
+    enableDucking: 1
+  - voiceKey: Tuto2_YB_20
+    speaker: 
+    clip: {fileID: 8300000, guid: 68e2a8fede859d74da455af437e75a41, type: 3}
+    volume: 1
+    is3D: 0
+    enableDucking: 1
+  - voiceKey: Tuto2_YB_21
+    speaker: 
+    clip: {fileID: 8300000, guid: 8e14d2c356afb9d42b086bed376cc103, type: 3}
+    volume: 1
+    is3D: 0
+    enableDucking: 1
+  - voiceKey: Tuto2_YB_22
+    speaker: 
+    clip: {fileID: 8300000, guid: ba3fdc133bb967e4aafee91c6eafad8e, type: 3}
+    volume: 1
+    is3D: 0
+    enableDucking: 1
+  - voiceKey: Tuto2_YB_23
+    speaker: 
+    clip: {fileID: 8300000, guid: 8cb81fb263a217b46b93a1adb4a8a5d8, type: 3}
+    volume: 1
+    is3D: 0
+    enableDucking: 1
+  - voiceKey: Tuto2_YB_24
+    speaker: 
+    clip: {fileID: 8300000, guid: 4a7cab9f224b2634399a78176c535ae0, type: 3}
+    volume: 1
+    is3D: 0
+    enableDucking: 1
+  - voiceKey: Tuto2_YB_25
+    speaker: 
+    clip: {fileID: 8300000, guid: 820bc3975ecb11b44ac86a88be87ebaa, type: 3}
+    volume: 1
+    is3D: 0
+    enableDucking: 1
+  - voiceKey: Tuto2_YB_26
+    speaker: 
+    clip: {fileID: 8300000, guid: 97fc180d152611044a2aed37a5748919, type: 3}
+    volume: 1
+    is3D: 0
+    enableDucking: 1
+  - voiceKey: Tuto2_YB_27-Fade
+    speaker: 
+    clip: {fileID: 8300000, guid: 08e5fc5a97c762546ac243efe4a125f4, type: 3}
+    volume: 1
+    is3D: 0
+    enableDucking: 1
+  - voiceKey: Tuto2_YB_27-Original
+    speaker: 
+    clip: {fileID: 8300000, guid: 319b974aefd95164e9607a9e159e9612, type: 3}
+    volume: 1
+    is3D: 0
+    enableDucking: 1
+  - voiceKey: ChooseOne_YB_01-Echo
+    speaker: 
+    clip: {fileID: 8300000, guid: 64542378f57daf843bf729e1c85dbf1f, type: 3}
+    volume: 1
+    is3D: 0
+    enableDucking: 1
+  - voiceKey: ChooseOne_YB_02-Echo
+    speaker: 
+    clip: {fileID: 8300000, guid: 6033faa2c07e8ca4b88cda16206deeb7, type: 3}
+    volume: 1
+    is3D: 0
+    enableDucking: 1
+  - voiceKey: HH1_YB_01
+    speaker: 
+    clip: {fileID: 8300000, guid: b900cb620b6789d4b8e8940d291a7cd8, type: 3}
+    volume: 1
+    is3D: 0
+    enableDucking: 1
+  - voiceKey: HH1_YB_02
+    speaker: 
+    clip: {fileID: 8300000, guid: 876c8b4f462af4e4d89675bdfab8a00a, type: 3}
+    volume: 1
+    is3D: 0
+    enableDucking: 1
+  - voiceKey: HH1_YB_03
+    speaker: 
+    clip: {fileID: 8300000, guid: 363c9cbc56e79014b93b6be9a191fda6, type: 3}
+    volume: 1
+    is3D: 0
+    enableDucking: 1
+  - voiceKey: HH1_YB_04
+    speaker: 
+    clip: {fileID: 8300000, guid: 6aa2cc4a12e26064e9f9d6cf5af12f5a, type: 3}
+    volume: 1
+    is3D: 0
+    enableDucking: 1
+  - voiceKey: HH1_YB_05
+    speaker: 
+    clip: {fileID: 8300000, guid: b49f0719c3e64384c8e54c06a9f3bfa4, type: 3}
+    volume: 1
+    is3D: 0
+    enableDucking: 1
+  - voiceKey: HH1_YB_07
+    speaker: 
+    clip: {fileID: 8300000, guid: b6f02d3cbca1f084788601d06887728c, type: 3}
+    volume: 1
+    is3D: 0
+    enableDucking: 1
+  - voiceKey: HH1_YB_08
+    speaker: 
+    clip: {fileID: 8300000, guid: e2546a74139010b44be69f8df9953d49, type: 3}
+    volume: 1
+    is3D: 0
+    enableDucking: 1
+  - voiceKey: HH1_YB_09
+    speaker: 
+    clip: {fileID: 8300000, guid: 804668c74808b4441b4ca3276d8147cf, type: 3}
+    volume: 1
+    is3D: 0
+    enableDucking: 1
+  - voiceKey: HH1_YB_10
+    speaker: 
+    clip: {fileID: 8300000, guid: fc559c469833a994188ad7ffa9e8d661, type: 3}
+    volume: 1
+    is3D: 0
+    enableDucking: 1
+  - voiceKey: HH1_YB_11
+    speaker: 
+    clip: {fileID: 8300000, guid: 4a50f067c05f3ca4ab0c73255f405aa9, type: 3}
+    volume: 1
+    is3D: 0
+    enableDucking: 1
+  - voiceKey: HH1_YB_12
+    speaker: 
+    clip: {fileID: 8300000, guid: 31746beb640876f4299cfddaed2a0080, type: 3}
+    volume: 1
+    is3D: 0
+    enableDucking: 1
+  - voiceKey: HH2_YB_01
+    speaker: 
+    clip: {fileID: 8300000, guid: 7e043cfd0138dcb4fa5826d6f3315545, type: 3}
+    volume: 1
+    is3D: 0
+    enableDucking: 1
+  - voiceKey: HH2_YB_02
+    speaker: 
+    clip: {fileID: 8300000, guid: e742ffe445ff63346b9384d4e47336e5, type: 3}
+    volume: 1
+    is3D: 0
+    enableDucking: 1
+  - voiceKey: HH2_YB_03
+    speaker: 
+    clip: {fileID: 8300000, guid: dc0b33df65e334b4e821b9f9eb734e2c, type: 3}
+    volume: 1
+    is3D: 0
+    enableDucking: 1
+  - voiceKey: HH2_YB_04
+    speaker: 
+    clip: {fileID: 8300000, guid: 49cf6199834c0d646a04990dce381f9d, type: 3}
+    volume: 1
+    is3D: 0
+    enableDucking: 1
+  - voiceKey: HH2_YB_05
+    speaker: 
+    clip: {fileID: 8300000, guid: 9be9fc0f809745644acfb8f8634d9383, type: 3}
+    volume: 1
+    is3D: 0
+    enableDucking: 1
+  - voiceKey: HH2_YB_06
+    speaker: 
+    clip: {fileID: 8300000, guid: 25649861f4f505147b86cd8fbdff884d, type: 3}
+    volume: 1
+    is3D: 0
+    enableDucking: 1
+  - voiceKey: HH2_YB_07
+    speaker: 
+    clip: {fileID: 8300000, guid: b917b6bbe47c6914192462a123e0406a, type: 3}
+    volume: 1
+    is3D: 0
+    enableDucking: 1
+  - voiceKey: HH2_YB_08
+    speaker: 
+    clip: {fileID: 8300000, guid: d633963086123a44cbe795af93ec88c8, type: 3}
+    volume: 1
+    is3D: 0
+    enableDucking: 1
+  - voiceKey: HH2_YB_09
+    speaker: 
+    clip: {fileID: 8300000, guid: 00b29816bfe4bed44a9a92f647c32d4a, type: 3}
+    volume: 1
+    is3D: 0
+    enableDucking: 1
+  - voiceKey: HH2_YB_10
+    speaker: 
+    clip: {fileID: 8300000, guid: 99c9b8b4a3dd99441bb3cdc646b6af80, type: 3}
+    volume: 1
+    is3D: 0
+    enableDucking: 1
+  - voiceKey: Prologue_YB_01
+    speaker: 
+    clip: {fileID: 8300000, guid: 8a321782a58f8164d96a0cd7f847532f, type: 3}
+    volume: 1
+    is3D: 0
+    enableDucking: 1
+  - voiceKey: Tuto1_YB_08_1
+    speaker: 
+    clip: {fileID: 8300000, guid: d3bddca556798264d82a1ccab17271dd, type: 3}
+    volume: 0.85
+    is3D: 0
+    enableDucking: 1
+  - voiceKey: Tuto2_YB_17_1
+    speaker: 
+    clip: {fileID: 8300000, guid: 540c5b4e65a9f3f4e88c1168f5fd8b43, type: 3}
+    volume: 1
+    is3D: 0
+    enableDucking: 1
+  - voiceKey: Tuto2_YB_20_1
+    speaker: 
+    clip: {fileID: 8300000, guid: 3075e60194cdaef4fb95f1e2618a4066, type: 3}
+    volume: 1
+    is3D: 0
+    enableDucking: 1
+  - voiceKey: YB_01
+    speaker: 
+    clip: {fileID: 8300000, guid: 7af0caafde11a724491b15fb5c333bc0, type: 3}
+    volume: 1
+    is3D: 0
+    enableDucking: 1
+  - voiceKey: YB_02
+    speaker: 
+    clip: {fileID: 8300000, guid: b478d5a1307d385458ae8070394ed23a, type: 3}
+    volume: 1
+    is3D: 0
+    enableDucking: 1
+  - voiceKey: YB_03
+    speaker: 
+    clip: {fileID: 8300000, guid: 05b08acc515583241bb5e7eee81a76b6, type: 3}
+    volume: 1
+    is3D: 0
+    enableDucking: 1
+  - voiceKey: YB_04
+    speaker: 
+    clip: {fileID: 8300000, guid: e3b3b1e9e9cae18478ed9af46971574b, type: 3}
+    volume: 1
+    is3D: 0
+    enableDucking: 1
+  - voiceKey: YB_05
+    speaker: 
+    clip: {fileID: 8300000, guid: 307b3008c3c377e43802e877bbb4e1d3, type: 3}
+    volume: 1
+    is3D: 0
+    enableDucking: 1
+  - voiceKey: YB_06
+    speaker: 
+    clip: {fileID: 8300000, guid: 05265dae90ca78d48ae42608f0dcfe80, type: 3}
+    volume: 1
+    is3D: 0
+    enableDucking: 1
+  - voiceKey: YB_07
+    speaker: 
+    clip: {fileID: 8300000, guid: c58960c2843721f4e850203fd9213c0a, type: 3}
+    volume: 1
+    is3D: 0
+    enableDucking: 1
+  - voiceKey: YB_08
+    speaker: 
+    clip: {fileID: 8300000, guid: bcb93203bdd4e3d46909f586545c30f2, type: 3}
+    volume: 1
+    is3D: 0
+    enableDucking: 1
+  - voiceKey: YB_09
+    speaker: 
+    clip: {fileID: 8300000, guid: 8caae0590ce7a3240ad48bf25a35397a, type: 3}
+    volume: 1
+    is3D: 0
+    enableDucking: 1
+  - voiceKey: Tuto2_Jen_01-Original
+    speaker: 
+    clip: {fileID: 8300000, guid: f26d50e0f9336c64891b29f5f6ddffa3, type: 3}
+    volume: 1
+    is3D: 0
+    enableDucking: 1
+  - voiceKey: Tuto2_Jen_02-Original
+    speaker: 
+    clip: {fileID: 8300000, guid: e780401917ac8b649919340815c7ae9c, type: 3}
+    volume: 1
+    is3D: 0
+    enableDucking: 1
+  - voiceKey: Tuto2_Jen_03-Original
+    speaker: 
+    clip: {fileID: 8300000, guid: fb2e7e32fcc078f4c92d3cd431df7498, type: 3}
+    volume: 1
+    is3D: 0
+    enableDucking: 1
+  - voiceKey: HH1_Jen_01
+    speaker: 
+    clip: {fileID: 8300000, guid: 177d51acb3851b14bab23a2240904523, type: 3}
+    volume: 1
+    is3D: 0
+    enableDucking: 1
+  - voiceKey: HH1_Jen_02
+    speaker: 
+    clip: {fileID: 8300000, guid: 2033916a91fe748478a98f2cbc134b43, type: 3}
+    volume: 1
+    is3D: 0
+    enableDucking: 1
+  - voiceKey: HH1_Jen_03_A
+    speaker: 
+    clip: {fileID: 8300000, guid: 4538380bc7db9994fb4db6c04548666c, type: 3}
+    volume: 1
+    is3D: 0
+    enableDucking: 1
+  - voiceKey: HH1_Jen_03_B
+    speaker: 
+    clip: {fileID: 8300000, guid: c85acd147355f3048952f65e0fcd26bc, type: 3}
+    volume: 1
+    is3D: 0
+    enableDucking: 1
+  - voiceKey: HH1_Jen_04
+    speaker: 
+    clip: {fileID: 8300000, guid: 65d98551151e3a64ea0419f1373b0f51, type: 3}
+    volume: 1
+    is3D: 0
+    enableDucking: 1
+  - voiceKey: HH2_Jen_01
+    speaker: 
+    clip: {fileID: 8300000, guid: dbad42aa363316b499ff7e37170d7be5, type: 3}
+    volume: 1
+    is3D: 0
+    enableDucking: 1
+  - voiceKey: HH2_Jen_02
+    speaker: 
+    clip: {fileID: 8300000, guid: c165ada06ca404243a20ee26e41c43f1, type: 3}
+    volume: 1
+    is3D: 0
+    enableDucking: 1
+  - voiceKey: Print_Jen_01
+    speaker: 
+    clip: {fileID: 8300000, guid: d0ac2451dd6f23642b1a1bded0c6c212, type: 3}
+    volume: 1
+    is3D: 0
+    enableDucking: 1
+  - voiceKey: Tuto2_Jen_01
+    speaker: 
+    clip: {fileID: 8300000, guid: 9be6e290353fb9541bd4f07feac646df, type: 3}
+    volume: 1
+    is3D: 0
+    enableDucking: 1
+  - voiceKey: Tuto2_Jen_02
+    speaker: 
+    clip: {fileID: 8300000, guid: e2abe05e00b31ab44ac2b43e679837f4, type: 3}
+    volume: 1
+    is3D: 0
+    enableDucking: 1
+  - voiceKey: Tuto2_Jen_03
+    speaker: 
+    clip: {fileID: 8300000, guid: 98e0b0f7cb9aee54583e072f9700388b, type: 3}
+    volume: 1
+    is3D: 0
+    enableDucking: 1
+  - voiceKey: Jen_01
+    speaker: 
+    clip: {fileID: 8300000, guid: 566cecf4c81511948a64168f9a603ba0, type: 3}
+    volume: 1
+    is3D: 0
+    enableDucking: 1
+  - voiceKey: Jen_02
+    speaker: 
+    clip: {fileID: 8300000, guid: 6c5abd8cae8c2754184e21c7dad756c3, type: 3}
+    volume: 1
+    is3D: 0
+    enableDucking: 1
+  - voiceKey: Jen_03
+    speaker: 
+    clip: {fileID: 8300000, guid: 52c1bcaf5ca9ce4498d74a95d4cdd3a6, type: 3}
+    volume: 1
+    is3D: 0
+    enableDucking: 1
+  - voiceKey: Jen_04
+    speaker: 
+    clip: {fileID: 8300000, guid: b0b2cd5af367ce342b35f7496cd7c23d, type: 3}
+    volume: 1
+    is3D: 0
+    enableDucking: 1
+  - voiceKey: Jen_05
+    speaker: 
+    clip: {fileID: 8300000, guid: 22df164cb2685f74989668736cb1ed56, type: 3}
+    volume: 1
+    is3D: 0
+    enableDucking: 1
+  - voiceKey: Jen_06
+    speaker: 
+    clip: {fileID: 8300000, guid: dd6a1b68ea7d72043ab3ab9952e61838, type: 3}
+    volume: 1
+    is3D: 0
+    enableDucking: 1
+  - voiceKey: Jen_07
+    speaker: 
+    clip: {fileID: 8300000, guid: 5102d5ed4fc5bee44b8944ec3ebb6ab9, type: 3}
+    volume: 1
+    is3D: 0
+    enableDucking: 1
+  - voiceKey: Jen_08
+    speaker: 
+    clip: {fileID: 8300000, guid: 015388abeecc7c044a0ecfa64f8c4fd2, type: 3}
+    volume: 1
+    is3D: 0
+    enableDucking: 1
+  - voiceKey: Jen_09
+    speaker: 
+    clip: {fileID: 8300000, guid: 200b29c6d4aae9a4c8a61e075f8e4860, type: 3}
+    volume: 1
+    is3D: 0
+    enableDucking: 1
+  - voiceKey: Jen_10
+    speaker: 
+    clip: {fileID: 8300000, guid: 00dfed34d80e11a4aab78f841623d5d3, type: 3}
+    volume: 1
+    is3D: 0
+    enableDucking: 1
+  - voiceKey: Jen_11
+    speaker: 
+    clip: {fileID: 8300000, guid: ec9e31fb234c61a4f9f93dd26b77f3c6, type: 3}
+    volume: 1
+    is3D: 0
+    enableDucking: 1
+  - voiceKey: Jen_12
+    speaker: 
+    clip: {fileID: 8300000, guid: b6412e2667b5d254b96dfc8a003cf065, type: 3}
+    volume: 1
+    is3D: 0
+    enableDucking: 1
+  - voiceKey: Jen_13
+    speaker: 
+    clip: {fileID: 8300000, guid: 0da32dc6c2d5a4c4494170ad56a71fab, type: 3}
+    volume: 1
+    is3D: 0
+    enableDucking: 1
+  - voiceKey: Jen_14
+    speaker: 
+    clip: {fileID: 8300000, guid: 10daf78297917a34d9d9025928e92e51, type: 3}
+    volume: 1
+    is3D: 0
+    enableDucking: 1
+  - voiceKey: Jen_15
+    speaker: 
+    clip: {fileID: 8300000, guid: eeb43da1d866bc548b88ff2262fcde06, type: 3}
+    volume: 1
+    is3D: 0
+    enableDucking: 1
+  - voiceKey: Jen_16
+    speaker: 
+    clip: {fileID: 8300000, guid: 45a586d01fdc13e4aa4a3baf066a3e1e, type: 3}
+    volume: 1
+    is3D: 0
+    enableDucking: 1
+  - voiceKey: Prologue_all
+    speaker: 
+    clip: {fileID: 8300000, guid: 68d55d422eb130e4c8fbbfb0fa347bd3, type: 3}
+    volume: 1
+    is3D: 0
+    enableDucking: 1

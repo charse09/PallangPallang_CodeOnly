@@ -1,0 +1,14 @@
+fileFormatVersion: 2
+guid: 7a8e84a38d1f25244b303a3e2f75707f
+MonoImporter:
+  externalObjects: {}
+  serializedVersion: 2
+  defaultReferences:
+  - beamPrefab: {fileID: 3246507457487974096, guid: 0bce74358c670fe4fa30ef3d660c3a64, type: 3}
+  - leftHandOverride: {instanceID: 0}
+  - rightHandOverride: {instanceID: 0}
+  executionOrder: 0
+  icon: {instanceID: 0}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 

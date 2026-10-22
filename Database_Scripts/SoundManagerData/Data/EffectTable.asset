@@ -1,0 +1,53 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3c7f37777f0cdd346953cd60ab9db650, type: 3}
+  m_Name: EffectTable
+  m_EditorClassIdentifier: Assembly-CSharp::SO_EffectTable
+  effectFolder: {fileID: 0}
+  includeSubfolders: 1
+  effectDataList:
+  - effectKey: FootstepDust
+    type: 5
+    prefab: {fileID: 8656522925564163052, guid: 581b0932af2227642a8f0bfb83732443, type: 3}
+    initialPoolSize: 50
+  - effectKey: JumpDust
+    type: 6
+    prefab: {fileID: 8205706795460263314, guid: 633f7423df3d4d141b55a548c1413f6c, type: 3}
+    initialPoolSize: 50
+  - effectKey: PaperTransform
+    type: 9
+    prefab: {fileID: 7305185502956871417, guid: 65047bb77f5cf46469ee42c44a47b94a, type: 3}
+    initialPoolSize: 50
+  - effectKey: LieDown
+    type: 11
+    prefab: {fileID: 8205706795460263314, guid: 633f7423df3d4d141b55a548c1413f6c, type: 3}
+    initialPoolSize: 50
+  - effectKey: WakeUp
+    type: 10
+    prefab: {fileID: 8205706795460263314, guid: 633f7423df3d4d141b55a548c1413f6c, type: 3}
+    initialPoolSize: 50
+  - effectKey: RollingSmoke
+    type: 12
+    prefab: {fileID: 8656522925564163052, guid: d11070a53390bef4ebdca4111be408f2, type: 3}
+    initialPoolSize: 50
+  - effectKey: HandEffect
+    type: 13
+    prefab: {fileID: 5824670795371433373, guid: 56fd95fc9d5ea594e956c1aa0b7868c4, type: 3}
+    initialPoolSize: 50
+  - effectKey: SlideSmoke
+    type: 14
+    prefab: {fileID: 8656522925564163052, guid: a5d4e7287890c3148be8a224024a5977, type: 3}
+    initialPoolSize: 10
+  - effectKey: Click_Star
+    type: 0
+    prefab: {fileID: 8176850701479282271, guid: a23efcb714ad1974fb9b7b96868045e2, type: 3}
+    initialPoolSize: 10

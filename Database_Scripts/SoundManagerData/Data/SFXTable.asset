@@ -1,0 +1,462 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 33fe83cd4386bbb49b53969ed7c7f859, type: 3}
+  m_Name: SFXTable
+  m_EditorClassIdentifier: Assembly-CSharp::SO_SFXTable
+  sfxFolder: {fileID: 0}
+  includeSubfolders: 1
+  removeMissingClips: 1
+  sfxDataList:
+  - soundKey: Jump
+    clip: {fileID: 8300000, guid: 94a2a247b0743e840a5866d92beccf1a, type: 3}
+    volume: 0.35
+    pitch: 1
+    randomPitchVariance: 0.005
+    is3D: 0
+  - soundKey: Land
+    clip: {fileID: 8300000, guid: d9e0e9c89666ba340a34fcdd8b67edf6, type: 3}
+    volume: 1
+    pitch: 1
+    randomPitchVariance: 0
+    is3D: 0
+  - soundKey: Slide
+    clip: {fileID: 8300000, guid: 69f8f6b3734423c4f9c08902832c2c05, type: 3}
+    volume: 1
+    pitch: 1
+    randomPitchVariance: 0
+    is3D: 0
+  - soundKey: StandUp
+    clip: {fileID: 8300000, guid: d366b724c53bd7049bd6924c76c6d58f, type: 3}
+    volume: 1
+    pitch: 1
+    randomPitchVariance: 0
+    is3D: 0
+  - soundKey: Footstep1
+    clip: {fileID: 8300000, guid: 733e4bd753a4d2e45a509d10116a87aa, type: 3}
+    volume: 1
+    pitch: 1
+    randomPitchVariance: 0
+    is3D: 0
+  - soundKey: QTE_Success
+    clip: {fileID: 8300000, guid: c415086fa2e1baa4982a866b326bb502, type: 3}
+    volume: 1
+    pitch: 1
+    randomPitchVariance: 0
+    is3D: 0
+  - soundKey: QTE_Fail
+    clip: {fileID: 8300000, guid: 4d8ba5a910ba50143a0cdda84723f918, type: 3}
+    volume: 1
+    pitch: 1
+    randomPitchVariance: 0
+    is3D: 0
+  - soundKey: VentOut
+    clip: {fileID: 8300000, guid: 658fae007b0e0074bb23360ac6a810c1, type: 3}
+    volume: 1
+    pitch: 1
+    randomPitchVariance: 0
+    is3D: 0
+  - soundKey: Telekinesis_Start
+    clip: {fileID: 8300000, guid: c191167687e7bab4b800ea019d6ff3ea, type: 3}
+    volume: 0.3
+    pitch: 1
+    randomPitchVariance: 0
+    is3D: 0
+  - soundKey: Telekinesis_Loop
+    clip: {fileID: 8300000, guid: 1a3b316e844c9fc45b5c2870d79c5800, type: 3}
+    volume: 0.3
+    pitch: 1
+    randomPitchVariance: 0
+    is3D: 0
+  - soundKey: Telekinesis_End
+    clip: {fileID: 8300000, guid: cc41623f1394865438b9232b94e40dfd, type: 3}
+    volume: 0.3
+    pitch: 1
+    randomPitchVariance: 0
+    is3D: 0
+  - soundKey: Reciept
+    clip: {fileID: 8300000, guid: 74bc225d8472aef4cb1459144f7a26e8, type: 3}
+    volume: 1
+    pitch: 1
+    randomPitchVariance: 0
+    is3D: 1
+  - soundKey: SideTalkBox
+    clip: {fileID: 8300000, guid: 0783f3ccf6025bd498b0c951fd479c30, type: 3}
+    volume: 0.5
+    pitch: 1
+    randomPitchVariance: 0
+    is3D: 0
+  - soundKey: QTE_Press
+    clip: {fileID: 8300000, guid: fb302c32b81c7f848802285f9a6c48f5, type: 3}
+    volume: 0.5
+    pitch: 1
+    randomPitchVariance: 0
+    is3D: 0
+  - soundKey: Chatbox_Pop
+    clip: {fileID: 8300000, guid: fffb9f2ab56030847bab06c4a658d728, type: 3}
+    volume: 0.4
+    pitch: 1
+    randomPitchVariance: 0
+    is3D: 0
+  - soundKey: Dialogue_Tong
+    clip: {fileID: 8300000, guid: f48daa9958467ea419a30fe33e34d4d6, type: 3}
+    volume: 0.2
+    pitch: 1
+    randomPitchVariance: 0
+    is3D: 0
+  - soundKey: QuestGuide_Open
+    clip: {fileID: 8300000, guid: 239a3a84f57422f4dbff47dfa63c996d, type: 3}
+    volume: 0.3
+    pitch: 1
+    randomPitchVariance: 0
+    is3D: 0
+  - soundKey: QuestGuide_Close
+    clip: {fileID: 8300000, guid: d0b6209a5775a7146928c21425693c69, type: 3}
+    volume: 0.3
+    pitch: 1
+    randomPitchVariance: 0
+    is3D: 0
+  - soundKey: UI_Hover
+    clip: {fileID: 8300000, guid: 072ac561c82361145bbb03db8820b589, type: 3}
+    volume: 0.1
+    pitch: 1
+    randomPitchVariance: 0
+    is3D: 0
+  - soundKey: UI_Trust
+    clip: {fileID: 8300000, guid: e41c31f707c0fa843ba567aacc6416af, type: 3}
+    volume: 0.15
+    pitch: 1
+    randomPitchVariance: 0
+    is3D: 0
+  - soundKey: UI_NotTrust
+    clip: {fileID: 8300000, guid: 9002752f55105e64a947a74b7512c4d1, type: 3}
+    volume: 0.5
+    pitch: 1
+    randomPitchVariance: 0
+    is3D: 0
+  - soundKey: GuideKeySuccess
+    clip: {fileID: 8300000, guid: 34fcd9aa58e06184cad302fff82c01bb, type: 3}
+    volume: 0.5
+    pitch: 1
+    randomPitchVariance: 0
+    is3D: 0
+  - soundKey: Player_Footstep_Loop
+    clip: {fileID: 8300000, guid: 08490772552ec2e4d851f9981dc5a564, type: 3}
+    volume: 0.5
+    pitch: 1
+    randomPitchVariance: 0
+    is3D: 1
+  - soundKey: BeeSound
+    clip: {fileID: 8300000, guid: 525a17cb4bb12c54cbd021b069c4ab6f, type: 3}
+    volume: 0.5
+    pitch: 1
+    randomPitchVariance: 0
+    is3D: 1
+  - soundKey: ReadyToShoot
+    clip: {fileID: 8300000, guid: e9e7b3f98cb3e0c4dab01dc660ec6263, type: 3}
+    volume: 0.2
+    pitch: 1
+    randomPitchVariance: 0
+    is3D: 0
+  - soundKey: LaunchShabun
+    clip: {fileID: 8300000, guid: 35b7d9cc3ee287145b25918629c20914, type: 3}
+    volume: 0.2
+    pitch: 1
+    randomPitchVariance: 0
+    is3D: 0
+  - soundKey: Jambeol_Button
+    clip: {fileID: 8300000, guid: c3f312abcca97464195f97aebea73064, type: 3}
+    volume: 0.5
+    pitch: 1
+    randomPitchVariance: 0
+    is3D: 0
+  - soundKey: Shabulka_Walk
+    clip: {fileID: 8300000, guid: 7addad93521da784db1b497455872068, type: 3}
+    volume: 0.15
+    pitch: 0.6
+    randomPitchVariance: 0
+    is3D: 1
+  - soundKey: PrintSound
+    clip: {fileID: 8300000, guid: f62a3f63a9a2eeb4997a331d504acaa8, type: 3}
+    volume: 0.6
+    pitch: 1
+    randomPitchVariance: 0
+    is3D: 0
+  - soundKey: Shabun_Wakeup
+    clip: {fileID: 8300000, guid: 68cc0164c25f3374694288f81692cf9e, type: 3}
+    volume: 0.5
+    pitch: 1
+    randomPitchVariance: 0
+    is3D: 0
+  - soundKey: Shabun_Walk
+    clip: {fileID: 8300000, guid: b9f0f1caea646ba40b02950b64032d7a, type: 3}
+    volume: 0.5
+    pitch: 1
+    randomPitchVariance: 0.05
+    is3D: 0
+  - soundKey: Shabulka_Talk
+    clip: {fileID: 8300000, guid: ac4d104c4f2bac44c98771fa84cef7f9, type: 3}
+    volume: 0.5
+    pitch: 1
+    randomPitchVariance: 0
+    is3D: 0
+  - soundKey: Berry_Falling
+    clip: {fileID: 8300000, guid: 8ff0da9c3524d7e41b2625d0e7139a7f, type: 3}
+    volume: 0.3
+    pitch: 0.7
+    randomPitchVariance: 0
+    is3D: 0
+  - soundKey: Berry_BumpCamera
+    clip: {fileID: 8300000, guid: 8bbdd5927d7d54b4384c0fe07731daf2, type: 3}
+    volume: 0.7
+    pitch: 1
+    randomPitchVariance: 0
+    is3D: 0
+  - soundKey: Berry_Scream
+    clip: {fileID: 8300000, guid: bb2935604a331f54a8c2cfbe57ffe8c5, type: 3}
+    volume: 0.15
+    pitch: 1
+    randomPitchVariance: 0
+    is3D: 0
+  - soundKey: UI_Click
+    clip: {fileID: 8300000, guid: deecb044e9be34949bef4e40d7b98673, type: 3}
+    volume: 0.3
+    pitch: 1
+    randomPitchVariance: 0
+    is3D: 0
+  - soundKey: Footstep_01
+    clip: {fileID: 8300000, guid: da9ac220784e58344a2ff79fac15a9c7, type: 3}
+    volume: 0.025
+    pitch: 0.6
+    randomPitchVariance: 0
+    is3D: 0
+  - soundKey: Shabulka_Laydown
+    clip: {fileID: 8300000, guid: f95dde460dc63ae4689f0c2ea1a8d800, type: 3}
+    volume: 0.3
+    pitch: 1
+    randomPitchVariance: 0
+    is3D: 0
+  - soundKey: Berry_Hide
+    clip: {fileID: 8300000, guid: 66ef4fdda8f3e254980d92099edb7a52, type: 3}
+    volume: 0.4
+    pitch: 1
+    randomPitchVariance: 0
+    is3D: 0
+  - soundKey: Yenbeol_Hide
+    clip: {fileID: 8300000, guid: 4ce9424ab1f080f4db69b1cfbfe64ddc, type: 3}
+    volume: 0.8
+    pitch: 1
+    randomPitchVariance: 0
+    is3D: 0
+  - soundKey: Shabulka_Landing
+    clip: {fileID: 8300000, guid: 6ed9c3904d3ffa748998d2396d3489d7, type: 3}
+    volume: 0.8
+    pitch: 1
+    randomPitchVariance: 0
+    is3D: 0
+  - soundKey: Kart_VroomVroom
+    clip: {fileID: 8300000, guid: 7508a7c1144df8e4ca643c56d1d2c12a, type: 3}
+    volume: 0.9
+    pitch: 1
+    randomPitchVariance: 0
+    is3D: 0
+  - soundKey: Kart_Move
+    clip: {fileID: 8300000, guid: 02a8b338a491e144b939f114940e38f4, type: 3}
+    volume: 0.6
+    pitch: 1
+    randomPitchVariance: 0
+    is3D: 1
+  - soundKey: Kart_Collision
+    clip: {fileID: 8300000, guid: e7895106afd1f3145baf8cdc148d0cf0, type: 3}
+    volume: 0.5
+    pitch: 1
+    randomPitchVariance: 0
+    is3D: 1
+  - soundKey: Train_Horn
+    clip: {fileID: 8300000, guid: 4f4b336fb8a30de47997cd7158502def, type: 3}
+    volume: 1
+    pitch: 1
+    randomPitchVariance: 0
+    is3D: 1
+  - soundKey: GuideKey_Outline
+    clip: {fileID: 8300000, guid: 8d56c493903b91c41b15e1428f212478, type: 3}
+    volume: 0.7
+    pitch: 1
+    randomPitchVariance: 0
+    is3D: 0
+  - soundKey: Nav_GuideLaunch
+    clip: {fileID: 8300000, guid: 16e46566ac8169a4a9331772e6c9616a, type: 3}
+    volume: 0.5
+    pitch: 1
+    randomPitchVariance: 0
+    is3D: 0
+  - soundKey: Shabun_flying
+    clip: {fileID: 8300000, guid: 8e84f6dcce8250d44a9d291baba75725, type: 3}
+    volume: 0.24
+    pitch: 1
+    randomPitchVariance: 0
+    is3D: 1
+  - soundKey: NarrationVoice
+    clip: {fileID: 8300000, guid: ad8bbefb48425fa4685368b236bd05d4, type: 3}
+    volume: 0.1
+    pitch: 1
+    randomPitchVariance: 0
+    is3D: 0
+  - soundKey: Berry_Rolling
+    clip: {fileID: 8300000, guid: d13ad1c00b8f8404290f33b49708a83e, type: 3}
+    volume: 0.15
+    pitch: 1
+    randomPitchVariance: 0
+    is3D: 0
+  - soundKey: Berry_WallHit
+    clip: {fileID: 8300000, guid: 11336f142f83efe4a99b0f8721fc116f, type: 3}
+    volume: 1
+    pitch: 1
+    randomPitchVariance: 0
+    is3D: 0
+  - soundKey: YenBeol_Carry
+    clip: {fileID: 8300000, guid: 70a4dcd5aec92ca4dbf302c8b753024e, type: 3}
+    volume: 0.7
+    pitch: 1
+    randomPitchVariance: 0
+    is3D: 0
+  - soundKey: YenBeol_KickedByMan
+    clip: {fileID: 8300000, guid: a78c83f5802d22843bec721f134289ba, type: 3}
+    volume: 0.5
+    pitch: 1
+    randomPitchVariance: 0
+    is3D: 0
+  - soundKey: YenBeol_KickedandFly
+    clip: {fileID: 8300000, guid: b0ef192f1e8cb3b49972e31bf099408f, type: 3}
+    volume: 0.4
+    pitch: 1
+    randomPitchVariance: 0
+    is3D: 0
+  - soundKey: Rollercoaster
+    clip: {fileID: 8300000, guid: d30319be8a9a38642959467123615c2d, type: 3}
+    volume: 0.1
+    pitch: 1
+    randomPitchVariance: 0.05
+    is3D: 0
+  - soundKey: Kart_EngineOn
+    clip: {fileID: 8300000, guid: 93b7d37e26b627b43b60ee1f9dcd84cb, type: 3}
+    volume: 0.9
+    pitch: 1
+    randomPitchVariance: 0
+    is3D: 0
+  - soundKey: YenBeol_Flutter
+    clip: {fileID: 8300000, guid: e51ce1a4241430d418ead10d8ac2fd93, type: 3}
+    volume: 1
+    pitch: 1
+    randomPitchVariance: 0
+    is3D: 0
+  - soundKey: Printer_Close
+    clip: {fileID: 8300000, guid: 4f48497d674e4964e8cb0ed19c91b942, type: 3}
+    volume: 0.75
+    pitch: 1
+    randomPitchVariance: 0
+    is3D: 0
+  - soundKey: RopeSound
+    clip: {fileID: 8300000, guid: 000b2ec0d7ec9c54ba40b9d954b65a62, type: 3}
+    volume: 0.1
+    pitch: 1
+    randomPitchVariance: 0
+    is3D: 1
+  - soundKey: BowShoot
+    clip: {fileID: 8300000, guid: 46dbfb8b68bb06a41a25a56d060f7ce5, type: 3}
+    volume: 0.5
+    pitch: 1
+    randomPitchVariance: 0
+    is3D: 1
+  - soundKey: SFX_StartBurning
+    clip: {fileID: 8300000, guid: f7e1858c79222d24d85dfa3bb17efb1c, type: 3}
+    volume: 0.2
+    pitch: 1
+    randomPitchVariance: 0
+    is3D: 0
+  - soundKey: SFX_Bump
+    clip: {fileID: 8300000, guid: 7b37396e3cef89641a3ba1d5fb2c0f2e, type: 3}
+    volume: 0.3
+    pitch: 1
+    randomPitchVariance: 0
+    is3D: 0
+  - soundKey: SFX_ObjectSwing
+    clip: {fileID: 8300000, guid: f974635eb31dc824c930cd8cc982c569, type: 3}
+    volume: 1
+    pitch: 1
+    randomPitchVariance: 0
+    is3D: 1
+  - soundKey: SFX_MachieMove
+    clip: {fileID: 8300000, guid: 5c7e659a49af2634a9751c76c8087bce, type: 3}
+    volume: 1
+    pitch: 1
+    randomPitchVariance: 0
+    is3D: 0
+  - soundKey: SFX_ArrowFlying
+    clip: {fileID: 8300000, guid: 4710d74656435ec48b4749c45b4ef19d, type: 3}
+    volume: 0.2
+    pitch: 1
+    randomPitchVariance: 0
+    is3D: 0
+  - soundKey: BR_19
+    clip: {fileID: 8300000, guid: e486dbdd02433c7409f98f3626ad2aa5, type: 3}
+    volume: 0.2
+    pitch: 1
+    randomPitchVariance: 0
+    is3D: 0
+  - soundKey: BR_02
+    clip: {fileID: 8300000, guid: e04556e26055cb14e9e3299bd82518bc, type: 3}
+    volume: 0.2
+    pitch: 1
+    randomPitchVariance: 0
+    is3D: 0
+  - soundKey: BR_07
+    clip: {fileID: 8300000, guid: aca9d754e587a2748a91c1e557445512, type: 3}
+    volume: 0.27
+    pitch: 1
+    randomPitchVariance: 0
+    is3D: 0
+  - soundKey: BR_12
+    clip: {fileID: 8300000, guid: d39c8e4c4dea2c84b9c252522a0d5eac, type: 3}
+    volume: 0.2
+    pitch: 1
+    randomPitchVariance: 0
+    is3D: 0
+  - soundKey: BR_20
+    clip: {fileID: 8300000, guid: 74312a0e2ec8cc140a277b09d6eca66a, type: 3}
+    volume: 0.2
+    pitch: 1
+    randomPitchVariance: 0
+    is3D: 0
+  - soundKey: BR_24
+    clip: {fileID: 8300000, guid: ec273b2fd942f6249857e7c5ab4ed081, type: 3}
+    volume: 0.2
+    pitch: 1
+    randomPitchVariance: 0
+    is3D: 0
+  - soundKey: BR_22
+    clip: {fileID: 8300000, guid: 248474095bc979b4c9195e55ad1ecf6e, type: 3}
+    volume: 0.2
+    pitch: 1
+    randomPitchVariance: 0
+    is3D: 0
+  - soundKey: SFX_IceCream_Splat_01
+    clip: {fileID: 8300000, guid: f5c745be8d2b7db4ead7ae2b921b4807, type: 3}
+    volume: 0.2
+    pitch: 1
+    randomPitchVariance: 0
+    is3D: 0
+  - soundKey: SFX_WoodGate_SplitOpen_02
+    clip: {fileID: 8300000, guid: c00b52a141bac8d49a0116bdf489827d, type: 3}
+    volume: 0.4
+    pitch: 1
+    randomPitchVariance: 0
+    is3D: 0

@@ -1,0 +1,71 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bfde220221aa1c14882863494285bfd6, type: 3}
+  m_Name: SoundDatabase
+  m_EditorClassIdentifier: Assembly-CSharp::SoundDatabase
+  soundList:
+  - soundID: Chain01
+    clip: {fileID: 8300000, guid: a932cb612e15b63448aa2d98018bb6d8, type: 3}
+  - soundID: Chain02
+    clip: {fileID: 8300000, guid: 142bc93674e7b4f4bb2657426e98bcaf, type: 3}
+  - soundID: Electric_Basic01
+    clip: {fileID: 8300000, guid: 6132b2a97af78584283710ea386b9e12, type: 3}
+  - soundID: Electric_Basic02
+    clip: {fileID: 8300000, guid: 462e49148dd57024d9d1113e5d276246, type: 3}
+  - soundID: Mechanical_Low01
+    clip: {fileID: 8300000, guid: d1aa82e96fc616d4c8bfebe098b11e19, type: 3}
+  - soundID: Alert_Mechanical01
+    clip: {fileID: 8300000, guid: f034e86ca1a2af9459e7d14225a1ddcf, type: 3}
+  - soundID: TV_Glitch
+    clip: {fileID: 8300000, guid: b78dea200321a8a4bb41ca9c46a3d02d, type: 3}
+  - soundID: ArmSwinging01
+    clip: {fileID: 8300000, guid: ccf07c3f4f870624a9d38cc808d691f5, type: 3}
+  - soundID: SlowMotion
+    clip: {fileID: 8300000, guid: 13ed6fb4d37f6e948aaa6faadd0f1975, type: 3}
+  - soundID: StichSound01
+    clip: {fileID: 8300000, guid: ffec3442ce1fc9b4bb36fa8c07d42933, type: 3}
+  - soundID: ElectricExplosion
+    clip: {fileID: 8300000, guid: 05baa5e3f37ac364b804b7ff359389f8, type: 3}
+  - soundID: SwingingSound
+    clip: {fileID: 8300000, guid: 9a6c90624775bf54db3619a653e8832b, type: 3}
+  - soundID: HitSound
+    clip: {fileID: 8300000, guid: 9c57e644c493fd049a3587d498dc6dc2, type: 3}
+  - soundID: UnicornHornFiring01
+    clip: {fileID: 8300000, guid: 3c9bd992ba448fe4099bb84a35657b53, type: 3}
+  - soundID: SkillBackground
+    clip: {fileID: 8300000, guid: aecfaf218e3547542833cc2fada829f6, type: 3}
+  - soundID: GatheringElectricity
+    clip: {fileID: 8300000, guid: 6e035f7e796e9114dac2894a939bf997, type: 3}
+  - soundID: JanBeolSpeaking002
+    clip: {fileID: 8300000, guid: 49f5dfcde08167e47a35be2122d18a7d, type: 3}
+  - soundID: JanBeolAngry
+    clip: {fileID: 8300000, guid: 107558d83c8692c4eb71a9d91c2f6c24, type: 3}
+  - soundID: JanBeolSpeaking
+    clip: {fileID: 8300000, guid: eecc1478e71220e499a4bc14d1c113dd, type: 3}
+  - soundID: PoppingPowerStrip
+    clip: {fileID: 8300000, guid: f97c5b724b246d94bad86d03979e7e65, type: 3}
+  - soundID: QTE_Success
+    clip: {fileID: 8300000, guid: bd2b47b3ce56735469dc1e20f978b870, type: 3}
+  - soundID: BigThuds
+    clip: {fileID: 8300000, guid: 15b39736a13fd49498d5cb2f91bad8a1, type: 3}
+  - soundID: BossCollapse
+    clip: {fileID: 8300000, guid: ef19838fb43b39d40a66b4cb33927da9, type: 3}
+  - soundID: BumpercarEngine
+    clip: {fileID: 8300000, guid: 6e7f903f29d6da44d9b67b4b55160751, type: 3}
+  - soundID: BigThuds002
+    clip: {fileID: 8300000, guid: 921521b835bab614084a5984f01461df, type: 3}
+  - soundID: BigThuds003
+    clip: {fileID: 8300000, guid: 8b9473b69229d9d4faa8381fbdb9fa83, type: 3}
+  - soundID: BigThuds004
+    clip: {fileID: 8300000, guid: 97d09ba04dd285548aced4f7ac2f95df, type: 3}
+  - soundID: BigThuds005
+    clip: {fileID: 8300000, guid: bec2f217cde7b354d9df88ad512c9418, type: 3}
